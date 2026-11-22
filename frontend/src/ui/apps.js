@@ -2,9 +2,15 @@ import { h, icon, appIcon } from '../dom.js';
 import { state, watch, set, favoriteApps } from '../store.js';
 import { actions } from '../actions.js';
 
-/** Home-screen shortcuts panel. */
+/** Home-screen shortcuts: a vertical rail on the right edge. */
 export function AppsPanel() {
-  const grid = h('div', { class: 'shortcut-row' });
+  const list = h('div', { class: 'shortcut-rail scroll' });
+  const allBtn = h(
+    'button',
+    { class: 'tile rail-all', 'aria-label': 'All apps', onclick: () => set({ view: 'apps', editShortcuts: false }) },
+    h('span', { class: 'tile-icon' }, icon('LayoutGrid', '1.9rem', 1.5)),
+    h('span', { class: 'tile-label', text: 'All apps' }),
+  );
 
   const render = () => {
     const apps = favoriteApps();
@@ -16,30 +22,22 @@ export function AppsPanel() {
         h('span', { class: 'tile-label', text: app.label }),
       ),
     );
-    tiles.push(
-      h(
-        'button',
-        { class: 'tile', 'aria-label': 'All apps', onclick: () => set({ view: 'apps', editShortcuts: false }) },
-        h('span', { class: 'tile-icon' }, icon('LayoutGrid', '2.2rem', 1.5)),
-        h('span', { class: 'tile-label', text: 'All apps' }),
-      ),
-    );
     if (!apps.length && state.apps.length) {
       tiles.push(
         h(
           'button',
           { class: 'tile', 'aria-label': 'Add shortcuts', onclick: () => set({ view: 'apps', editShortcuts: true }) },
-          h('span', { class: 'tile-icon' }, icon('Plus', '2.2rem', 1.5)),
-          h('span', { class: 'tile-label', text: 'Add shortcuts' }),
+          h('span', { class: 'tile-icon' }, icon('Plus', '1.9rem', 1.5)),
+          h('span', { class: 'tile-label', text: 'Add apps' }),
         ),
       );
     }
-    grid.replaceChildren(...tiles);
+    list.replaceChildren(...tiles);
   };
   watch(['apps', 'settings'], render);
   render();
 
-  return h('section', { class: 'card px-2 py-1', 'aria-label': 'Shortcuts' }, grid);
+  return h('section', { class: 'card apps-rail', 'aria-label': 'Shortcuts' }, list, allBtn);
 }
 
 /** Full app drawer with search and pin/unpin editing. */
@@ -105,7 +103,7 @@ export function AllAppsView() {
       'div',
       { class: 'flex items-center gap-3' },
       h('button', { class: 'btn btn-icon', 'aria-label': 'Back', onclick: () => set({ view: 'home' }) }, icon('ArrowLeft', '1.4rem')),
-      h('label', { class: 'search' }, icon('Search', '1.2rem'), input),
+      h('label', { class: 'search' }, icon('Search', '1.4rem'), input),
       editBtn,
     ),
     hint,

@@ -32,7 +32,7 @@ const statusPill = (ok, okText, badText) =>
 
 function appearance() {
   return [
-    heading('Appearance', 'Also available from the swatches on the home screen.'),
+    heading('Appearance', 'Choose the launcher color theme.'),
     ...THEMES.map((t) => radioRow(t.label, state.settings.theme === t.id, () => actions.setTheme(t.id), null, t.hint)),
   ];
 }

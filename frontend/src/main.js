@@ -3,11 +3,12 @@ import { connect, call, on } from './bridge.js';
 import { state, set, watch } from './store.js';
 import { actions } from './actions.js';
 import { h } from './dom.js';
-import { ClockPanel, Toolbar } from './ui/clock.js';
+import { ClockPanel } from './ui/clock.js';
 import { AppsPanel, AllAppsView } from './ui/apps.js';
 import { MusicPanel } from './ui/music.js';
 import { Dock } from './ui/dock.js';
 import { SettingsView } from './ui/settings.js';
+import { FocusView } from './ui/focus.js';
 
 async function boot() {
   const kind = await connect();
@@ -50,20 +51,26 @@ function render() {
   // Views are created on first visit to keep startup light.
   const factories = {
     home: () =>
-      h('div', { class: 'dashboard' }, ClockPanel(), h('div', { class: 'dashboard-right' }, Toolbar(), MusicPanel(), AppsPanel())),
+      h('div', { class: 'dashboard' }, ClockPanel(), MusicPanel(), AppsPanel()),
     apps: AllAppsView,
     settings: SettingsView,
+    focus: FocusView,
   };
   const show = () => {
     const v = state.view;
     if (!views[v]) views[v] = factories[v]();
     for (const [k, el] of Object.entries(views)) el.hidden = k !== v;
     if (!main.contains(views[v])) main.append(views[v]);
+    // Focus mode is full screen: no dock, no outer padding.
+    app.classList.toggle('is-focus', v === 'focus');
+    dock.hidden = v === 'focus';
   };
+  const app = document.getElementById('app');
+  const dock = Dock();
   watch(['view'], show);
   show();
 
-  document.getElementById('app').replaceChildren(main, Dock());
+  app.replaceChildren(main, dock);
 }
 
 boot();

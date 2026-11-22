@@ -7,7 +7,7 @@ export const state = {
   apps: [],
   music: null,
   system: { isDefaultLauncher: false, homeRoleAvailable: false, notificationAccess: false, sdkInt: 0 },
-  view: 'home', // home | apps | settings
+  view: 'home', // home | focus | apps | settings
   settingsSection: 'appearance',
   editShortcuts: false,
   query: '',

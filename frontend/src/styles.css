@@ -18,6 +18,15 @@
   --primary-soft: rgb(79 70 229 / 0.22);
   --primary-text: #a5a0ff; /* indigo tuned for AA contrast on black */
   --amber: #f59e0b;
+  --card-top: #161616;
+  --card-hl: rgb(255 255 255 / 0.06);
+  --face: #0b0b0b;
+  --shadow: 0 10px 30px rgb(0 0 0 / 0.5);
+  --ambient-veil-edge: rgb(0 0 0 / 0.6);
+  --ambient-veil-bottom: rgb(0 0 0 / 0.65);
+  --ambient-track: rgb(255 255 255 / 0.2);
+  --ambient-ctl: rgb(255 255 255 / 0.12);
+  --ambient-muted: rgb(255 255 255 / 0.72);
   color-scheme: dark;
 }
 
@@ -33,6 +42,15 @@
   --primary-soft: rgb(79 70 229 / 0.12);
   --primary-text: #4338ca;
   --amber: #d97706; /* deeper amber for contrast on white */
+  --card-top: #fafafa;
+  --card-hl: rgb(255 255 255 / 0.9);
+  --face: #f7f7f7;
+  --shadow: 0 10px 28px rgb(0 0 0 / 0.08);
+  --ambient-veil-edge: rgb(255 255 255 / 0.65);
+  --ambient-veil-bottom: rgb(255 255 255 / 0.7);
+  --ambient-track: rgb(0 0 0 / 0.14);
+  --ambient-ctl: rgb(255 255 255 / 0.55);
+  --ambient-muted: rgb(0 0 0 / 0.62);
   color-scheme: light;
 }
 
@@ -47,7 +65,7 @@
   --color-primary-soft: var(--primary-soft);
   --color-primary-text: var(--primary-text);
   --font-sans: Inter, Roboto, "Google Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --radius-card: 14px;
+  --radius-card: 20px;
   --radius-ctl: 10px;
 }
 
@@ -102,14 +120,15 @@
     height: 100dvh;
     display: grid;
     grid-template-rows: minmax(0, 1fr) auto;
-    gap: 0.9rem;
-    padding: 1.1rem 1.25rem 0.9rem;
+    gap: 1.25rem;
+    padding: 1.5rem 1.75rem 1.1rem;
     box-sizing: border-box;
   }
 
   .card {
-    background: var(--surface);
+    background: linear-gradient(180deg, var(--card-top), var(--surface) 60%);
     border-radius: var(--radius-card);
+    box-shadow: inset 0 1px 0 var(--card-hl);
   }
 
   .label {
@@ -121,20 +140,172 @@
   }
 
   /* ---- Clock panel (left column) --------------------------------------- */
+  /* Swipeable pages (native scroll-snap) with dots below. */
+  .pager {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .pager-track {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .pager-track::-webkit-scrollbar {
+    display: none;
+  }
+  .pager-page {
+    flex: 0 0 100%;
+    min-width: 0;
+    min-height: 0;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    box-sizing: border-box;
+  }
+  .pager-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.25rem;
+  }
+  .pager-dot {
+    width: 2.25rem;
+    height: 1.75rem;
+    padding: 0;
+    background: none;
+    display: grid;
+    place-items: center;
+  }
+  .pager-dot::before {
+    content: "";
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    background: var(--track);
+    transition:
+      width 160ms ease,
+      background-color 160ms ease;
+  }
+  .pager-dot[aria-current="true"]::before {
+    width: 1.4rem;
+    background: var(--primary);
+  }
+
   .clock-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    min-width: 0;
+  }
+  .clock-page {
     container-type: size;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4cqh;
-    padding: 1.25rem;
-    min-height: 0;
+    gap: 6cqh;
+    padding: 1.5rem;
   }
+
+  /* Page 2: big split-weight time, seconds sweep bar, full date. */
+  .big-clock {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: fit-content;
+    max-width: 100%;
+  }
+  .big-weekday {
+    font-size: min(4.6cqw, 4.4cqh);
+    letter-spacing: 0.32em;
+    color: var(--primary-text);
+    margin-bottom: 1.5cqh;
+  }
+  .big-time {
+    display: flex;
+    align-items: baseline;
+    font-size: min(30cqw, 32cqh);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+  }
+  .big-hh {
+    font-weight: 700;
+  }
+  .big-colon {
+    font-weight: 200;
+    color: var(--fg-muted);
+    margin: 0 0.02em;
+  }
+  .big-mm {
+    font-weight: 200;
+  }
+  .big-sec {
+    font-size: 0.22em;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--amber);
+    margin-left: 0.25em;
+    align-self: flex-start;
+    margin-top: 0.4em;
+  }
+  .sec-bar {
+    align-self: stretch;
+    height: 3px;
+    margin: 3cqh 0 3.5cqh;
+    border-radius: 999px;
+    background: var(--track);
+    overflow: hidden;
+  }
+  .sec-bar > span {
+    display: block;
+    height: 100%;
+    background: var(--amber);
+    transform-origin: left center;
+    transform: scaleX(var(--p, 0));
+    animation: sec-fill 60s linear infinite;
+  }
+  @keyframes sec-fill {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+  .big-date {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6em;
+    font-size: min(7cqw, 6.6cqh);
+    white-space: nowrap;
+  }
+  .big-daynum {
+    font-weight: 700;
+    font-size: 1.6em;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .big-month {
+    font-weight: 400;
+    color: var(--fg-muted);
+  }
+
   .analog {
-    width: min(78cqw, 52cqh);
+    width: min(72cqw, 48cqh);
     aspect-ratio: 1;
     flex: none;
+  }
+  .analog .face {
+    fill: var(--face);
+    stroke: var(--track);
+    stroke-width: 1;
   }
   .analog .tick {
     stroke: var(--fg-muted);
@@ -162,6 +333,30 @@
   .analog .hub-second {
     fill: var(--amber);
   }
+  .analog .minute-num {
+    fill: var(--fg-muted);
+    font-size: 12px;
+    font-weight: 500;
+    text-anchor: middle;
+    dominant-baseline: central;
+    font-variant-numeric: tabular-nums;
+  }
+  /* Smooth sweeping second hand: one turn per minute, aligned from JS via a
+     negative animation-delay. With reduced motion the global rule disables the
+     animation and the per-second transform attribute takes over. */
+  .analog .second-sweep {
+    transform-box: view-box;
+    transform-origin: 100px 100px;
+    animation: second-sweep 60s linear infinite;
+  }
+  @keyframes second-sweep {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
   .digital {
     font-size: min(16cqw, 15cqh);
     line-height: 1;
@@ -177,42 +372,42 @@
     letter-spacing: 0;
     color: var(--amber); /* matches the analog second hand */
   }
+  /* Date: the day number is the hero, weekday and month/year stacked beside it. */
   .date {
-    margin-top: 0.6rem;
-    font-size: min(4.4cqw, 4.2cqh);
+    margin-top: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem;
+  }
+  .date-num {
+    font-size: min(15cqw, 12cqh);
+    font-weight: 600;
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+    color: var(--fg);
+  }
+  .date-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    text-align: left;
+    padding-left: 0.9rem;
+    border-left: 2px solid var(--primary);
+  }
+  .date-weekday {
+    font-size: min(5.6cqw, 4.8cqh);
+    font-weight: 600;
+    line-height: 1.15;
+    color: var(--fg);
+  }
+  .date-day {
+    white-space: nowrap;
+    font-size: min(4.4cqw, 3.8cqh);
+    font-weight: 500;
+    line-height: 1.15;
     color: var(--fg-muted);
-    text-align: center;
-  }
-
-  /* ---- Theme swatches --------------------------------------------------- */
-  .swatch {
-    width: max(3rem, 48px);
-    height: max(3rem, 48px);
-    display: grid;
-    place-items: center;
-    background: none;
-    padding: 0;
-  }
-  .swatch > span {
-    width: 1.6rem;
-    height: 1.6rem;
-    border-radius: 999px;
-    transition: box-shadow 120ms ease;
-  }
-  /* Fixed swatch colors (not theme tokens): they preview each theme. A faint
-     inner ring keeps the swatch that matches the page background visible. */
-  .swatch[data-theme-id="black"] > span {
-    background: #000000;
-    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.25);
-  }
-  .swatch[data-theme-id="white"] > span {
-    background: #ffffff;
-    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.15);
-  }
-  .swatch[aria-pressed="true"] > span {
-    box-shadow:
-      0 0 0 3px var(--bg),
-      0 0 0 5px var(--primary);
   }
 
   /* ---- Buttons ---------------------------------------------------------- */
@@ -256,25 +451,66 @@
   }
 
   /* ---- Apps ------------------------------------------------------------- */
+  /* All apps: large tiles so an app is easy to spot and hit while parked. */
   .app-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(6.4rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
     grid-auto-rows: max-content;
-    gap: 0.5rem;
+    gap: 0.75rem 0.5rem;
     align-content: start;
   }
-  /* Home shortcuts: one horizontal row under the music player. */
-  .shortcut-row {
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: 6.2rem;
-    gap: 0.25rem;
-    overflow-x: auto;
-    overscroll-behavior: contain;
-    scrollbar-width: none;
+  .app-grid .tile {
+    gap: 0.7rem;
+    padding: 1rem 0.5rem 0.9rem;
+    border-radius: 18px;
   }
-  .shortcut-row::-webkit-scrollbar {
-    display: none;
+  .app-grid .tile-icon {
+    width: 4.6rem;
+    height: 4.6rem;
+  }
+  .app-grid .tile-label {
+    font-size: 1.05rem;
+    font-weight: 500;
+  }
+  .app-grid .tile-badge {
+    width: 1.9rem;
+    height: 1.9rem;
+    top: 0.6rem;
+    right: 0.9rem;
+  }
+  /* Home shortcuts: vertical rail on the right, "All apps" pinned at the bottom. */
+  .apps-rail {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    padding: 0.6rem 0.5rem;
+    gap: 0.4rem;
+  }
+  .shortcut-rail {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .apps-rail .tile {
+    flex: none;
+    gap: 0.45rem;
+    padding: 0.75rem 0.35rem 0.65rem;
+  }
+  .apps-rail .tile-icon {
+    width: 3.3rem;
+    height: 3.3rem;
+    padding: 0.4rem;
+    box-sizing: border-box;
+    border-radius: 16px;
+    background: var(--elevated);
+  }
+  .apps-rail .tile-label {
+    font-size: 0.78rem;
+  }
+  .rail-all .tile-icon {
+    color: var(--fg);
   }
   .tile {
     position: relative;
@@ -340,20 +576,73 @@
   }
 
   /* ---- Music ------------------------------------------------------------ */
+  /* Top: large artwork + track info. Bottom: progress and controls.
+     Sizes follow the card (container units) so it stays filled at any resolution. */
   .music {
     container-type: size;
     display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    row-gap: 4cqh;
+    padding: 1.5rem 1.75rem 1.4rem;
+    min-height: 0;
+  }
+  /* Ambient: blurred, saturated artwork behind the card. A theme-tinted veil
+     keeps text and controls readable in both Full Black and Pure White. */
+  .music {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .music-ambient {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+  .music-ambient img {
+    position: absolute;
+    inset: -25%;
+    width: 150%;
+    height: 150%;
+    object-fit: cover;
+    filter: blur(64px) saturate(1.15);
+    opacity: 0.38;
+    transition: opacity 400ms ease;
+  }
+  .music-ambient::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(120% 90% at 20% 30%, transparent 0%, var(--ambient-veil-edge) 100%),
+      linear-gradient(180deg, transparent 45%, var(--ambient-veil-bottom) 100%);
+  }
+  .music.has-ambient .art {
+    box-shadow: 0 12px 32px rgb(0 0 0 / 0.35);
+  }
+  .music.has-ambient .bar {
+    background: var(--ambient-track);
+  }
+  .music.has-ambient .ctl:not(.ctl-main) {
+    background: var(--ambient-ctl);
+    backdrop-filter: blur(8px);
+  }
+  .music.has-ambient .track-sub,
+  .music.has-ambient .times,
+  .music.has-ambient .source {
+    color: var(--ambient-muted);
+  }
+  .music-top {
+    display: grid;
     grid-template-columns: auto minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr) auto auto;
-    column-gap: 1.25rem;
-    row-gap: 0.8rem;
-    padding: 1.1rem 1.25rem;
+    align-items: center;
+    column-gap: 1.75rem;
     min-height: 0;
   }
   .art {
-    width: min(42cqw, 56cqh);
+    width: min(50cqw, 58cqh);
     aspect-ratio: 1;
-    border-radius: 12px;
+    border-radius: 18px;
     overflow: hidden;
     background: var(--elevated);
     display: grid;
@@ -368,26 +657,31 @@
     display: block;
     /* intentionally no filter: artwork keeps its natural colors */
   }
+  .music-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 3cqh;
+  }
   .track-meta {
-    align-self: end;
     min-width: 0;
     text-align: left;
     background: none;
     padding: 0;
   }
   .track-title {
-    font-size: 1.5rem;
-    font-weight: 600;
+    font-size: clamp(1.4rem, 5.6cqh, 2rem);
+    font-weight: 700;
     line-height: 1.2;
+    letter-spacing: -0.01em;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     overflow-wrap: anywhere;
   }
   .track-sub {
-    margin-top: 0.3rem;
-    font-size: 1rem;
+    margin-top: 0.5rem;
+    font-size: clamp(0.95rem, 3.6cqh, 1.2rem);
     color: var(--fg-muted);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -397,14 +691,15 @@
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    margin-bottom: 0.7rem;
+    max-width: 100%;
+    padding: 0.3rem 0.7rem 0.3rem 0.55rem;
+    border-radius: 999px;
+    background: var(--ambient-ctl);
+    margin-bottom: 1rem;
   }
 
-  .progress {
-    grid-column: 1 / -1;
-  }
   .bar {
-    height: 4px;
+    height: 5px;
     border-radius: 999px;
     background: var(--track);
     overflow: hidden;
@@ -424,34 +719,42 @@
   .times {
     display: flex;
     justify-content: space-between;
-    margin-top: 0.4rem;
+    margin-top: 0.6rem;
     font-size: 0.85rem;
     color: var(--fg-muted);
     font-variant-numeric: tabular-nums;
   }
 
   .controls {
-    grid-column: 1 / -1;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 1.5rem;
+    gap: clamp(1.25rem, 4cqw, 2.5rem);
   }
   .ctl {
-    width: max(3.4rem, 52px);
-    height: max(3.4rem, 52px);
+    flex: none;
+    width: max(clamp(3.4rem, 11cqh, 4.4rem), 52px);
+    height: max(clamp(3.4rem, 11cqh, 4.4rem), 52px);
     border-radius: 999px;
     background: var(--elevated);
     display: grid;
     place-items: center;
     transition: transform 100ms ease;
   }
+  .ctl svg {
+    width: 40%;
+    height: 40%;
+  }
+  .ctl-main svg {
+    width: 42%;
+    height: 42%;
+  }
   .ctl:active {
     transform: scale(0.93);
   }
   .ctl-main {
-    width: max(4.3rem, 64px);
-    height: max(4.3rem, 64px);
+    width: max(clamp(4.3rem, 14cqh, 5.6rem), 64px);
+    height: max(clamp(4.3rem, 14cqh, 5.6rem), 64px);
     background: var(--primary);
     color: var(--primary-fg);
   }
@@ -485,9 +788,13 @@
   .dock {
     display: flex;
     justify-content: center;
-    gap: 0.5rem;
-    padding: 0.35rem;
+    gap: 0.4rem;
+    padding: 0.4rem;
     margin: 0 auto;
+    border-radius: 999px;
+    box-shadow:
+      inset 0 1px 0 var(--card-hl),
+      var(--shadow);
   }
   .dock-item {
     position: relative;
@@ -495,8 +802,8 @@
     align-items: center;
     gap: 0.55rem;
     min-height: max(3.3rem, 48px);
-    padding: 0 1.25rem;
-    border-radius: var(--radius-ctl);
+    padding: 0 1.35rem;
+    border-radius: 999px;
     background: transparent;
     color: var(--fg-muted);
     font-size: 0.9rem;
@@ -529,9 +836,9 @@
     align-items: center;
     gap: 0.6rem;
     flex: 1;
-    min-height: max(3rem, 48px);
-    padding: 0 1rem;
-    border-radius: var(--radius-ctl);
+    min-height: max(3.6rem, 52px);
+    padding: 0 1.2rem;
+    border-radius: 999px;
     background: var(--elevated);
     color: var(--fg-muted);
   }
@@ -546,7 +853,7 @@
     outline: none;
     color: var(--fg);
     font: inherit;
-    font-size: 1rem;
+    font-size: 1.2rem;
     user-select: text;
   }
 
@@ -643,19 +950,130 @@
   }
 }
 
-/* ---- Dashboard layout ------------------------------------------------------
-   Left: big clock (analog + digital) and date.
-   Right: theme toolbar, music player, shortcuts row underneath.               */
-.dashboard {
-  display: grid;
-  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr);
-  gap: 1rem;
+/* ---- Focus mode -----------------------------------------------------------
+   Full screen, no dock. Page 1: clock only. Page 2: clock + minimal player.  */
+.app.is-focus {
+  grid-template-rows: minmax(0, 1fr);
+  padding: 1rem 1.25rem 0.75rem;
+}
+.focus {
+  position: relative;
+  display: flex;
+  flex-direction: column;
   min-height: 0;
 }
-.dashboard-right {
+.focus-exit {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--fg-muted);
+  z-index: 2;
+}
+.focus-page {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
-  gap: 0.8rem;
+  grid-template-columns: minmax(0, 1fr);
+  padding: 0 1rem;
+}
+.focus-split {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 2.5rem;
+}
+.focus-cell {
+  container-type: size;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* Clock-only page: as big as the screen allows. */
+.big-clock.is-focus .big-time {
+  font-size: min(25cqw, 46cqh);
+}
+.big-clock.is-focus .big-weekday {
+  font-size: min(2.6cqw, 4.4cqh);
+}
+.big-clock.is-focus .big-date {
+  font-size: min(4.2cqw, 7cqh);
+}
+.big-clock.is-focus .sec-bar {
+  height: 4px;
+}
+
+.focus-player {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4cqh;
+  width: min(100%, 64cqh + 6rem);
+}
+.focus-art {
+  width: min(100cqw, 50cqh);
+  aspect-ratio: 1;
+  padding: 0;
+  border-radius: 22px;
+  overflow: hidden;
+  background: var(--elevated);
+  color: var(--fg-muted);
+  display: grid;
+  place-items: center;
+  box-shadow: var(--shadow);
+}
+.focus-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.focus-info {
+  align-self: stretch;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 1.5rem;
+  row-gap: 0.4rem;
+  align-items: center;
+}
+.focus-title {
+  font-size: clamp(1.3rem, 5.5cqh, 2rem);
+  font-weight: 700;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.focus-artist {
+  grid-column: 1;
+  font-size: clamp(0.95rem, 3.6cqh, 1.25rem);
+  color: var(--fg-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.focus-progress {
+  grid-column: 1;
+  margin-top: 0.8rem;
+}
+.focus-info .ctl-main {
+  grid-column: 2;
+  grid-row: 1 / span 3;
+}
+.focus-empty {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--fg-muted);
+  font-size: 1.1rem;
+}
+
+/* ---- Dashboard layout ------------------------------------------------------
+   Left: big clock (analog + digital) and date.
+   Middle: music player. Right: vertical rail of pinned apps.                  */
+.dashboard {
+  display: grid;
+  grid-template-columns: minmax(0, 0.72fr) minmax(0, 1fr) 7.2rem;
+  gap: 1.25rem;
   min-height: 0;
 }
 
@@ -663,12 +1081,24 @@
 @media (max-aspect-ratio: 5/4), (max-width: 720px) {
   .dashboard {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
   }
-  .clock-panel {
+  .apps-rail,
+  .shortcut-rail {
+    flex-direction: row;
+  }
+  .shortcut-rail {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  .apps-rail .tile {
+    width: 6.2rem;
+  }
+  .clock-page {
     container-type: inline-size;
     flex-direction: row;
     gap: 1.5rem;
+    padding: 1rem;
   }
   .analog {
     width: 7rem;
@@ -676,11 +1106,35 @@
   .digital {
     font-size: 3.5rem;
   }
+  .big-time {
+    font-size: 6rem;
+  }
+  .big-weekday {
+    font-size: 0.9rem;
+  }
+  .big-date {
+    font-size: 1.3rem;
+  }
   .date {
-    font-size: 1rem;
+    margin-top: 0.5rem;
+  }
+  .date-num {
+    font-size: 2.6rem;
+  }
+  .date-weekday {
+    font-size: 1.15rem;
+  }
+  .date-day {
+    font-size: 0.95rem;
   }
   .dock-item > span {
     display: none;
+  }
+  .focus-split {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1.3fr);
+    gap: 1.5rem;
+    padding-top: 3.5rem;
   }
 }
 

@@ -26,7 +26,13 @@ export function MusicPanel() {
   const playBtn = h('button', { class: 'ctl ctl-main', 'aria-label': 'Play', onclick: () => actions.playPause() });
   const nextBtn = h('button', { class: 'ctl', 'aria-label': 'Next', onclick: () => actions.nextTrack() }, icon('SkipForward', '1.5rem'));
   const controls = h('div', { class: 'controls' }, prevBtn, playBtn, nextBtn);
-  const playingNodes = [artBtn, meta, progress, controls];
+  const top = h('div', { class: 'music-top' }, artBtn, meta);
+  const bottom = h('div', { class: 'music-bottom' }, progress, controls);
+  // Ambient backdrop: the artwork itself, heavily blurred behind the card content.
+  const ambientImg = h('img', { alt: '', decoding: 'async', draggable: 'false' });
+  ambientImg.addEventListener('error', () => (ambient.hidden = true));
+  const ambient = h('div', { class: 'music-ambient', 'aria-hidden': 'true' }, ambientImg);
+  const playingNodes = [ambient, top, bottom];
 
   let artUrl = null;
   let playIconState = null;
@@ -57,6 +63,7 @@ export function MusicPanel() {
   function render() {
     const m = state.music;
     clearTimeout(timer);
+    root.classList.remove('has-ambient');
 
     if (state.bridge === 'none') {
       mode = null;
@@ -118,6 +125,8 @@ export function MusicPanel() {
 
     if (m.artwork !== artUrl) {
       artUrl = m.artwork;
+      ambient.hidden = !artUrl;
+      if (artUrl) ambientImg.src = artUrl;
       if (artUrl) {
         const img = h('img', { src: artUrl, alt: '', decoding: 'async', draggable: 'false' });
         img.addEventListener('error', () => artBtn.replaceChildren(icon('Music', '35%', 1.25)), { once: true });
@@ -126,6 +135,8 @@ export function MusicPanel() {
         artBtn.replaceChildren(icon('Music', '35%', 1.25));
       }
     }
+
+    root.classList.toggle('has-ambient', !!artUrl);
 
     const playing = m.playback === 'playing' || m.playback === 'buffering';
     if (playIconState !== playing) {
