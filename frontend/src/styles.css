@@ -951,7 +951,7 @@
 }
 
 /* ---- Focus mode -----------------------------------------------------------
-   Full screen, no dock. Page 1: clock only. Page 2: clock + minimal player.  */
+   Full screen, no dock. Clock-only, split music, and stacked compact music. */
 .app.is-focus {
   grid-template-rows: minmax(0, 1fr);
   padding: 1rem 1.25rem 0.75rem;
@@ -1067,6 +1067,82 @@
   font-size: 1.1rem;
 }
 
+/* Stacked focus option: keep the large clock centered, with quiet metadata
+   immediately below it so the time remains the visual anchor. */
+.focus-stacked {
+  container-type: size;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1.5rem, 6cqh, 3.5rem);
+  padding: 3rem clamp(1rem, 7cqw, 6rem) 2rem;
+}
+.focus-stacked-clock {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  min-height: 0;
+}
+.big-clock.is-stacked .big-time {
+  font-size: min(22cqw, 34cqh);
+}
+.big-clock.is-stacked .big-weekday {
+  font-size: min(2.3cqw, 3.5cqh);
+}
+.big-clock.is-stacked .big-date {
+  font-size: min(3.8cqw, 5.8cqh);
+}
+.focus-mini-player {
+  display: grid;
+  grid-template-columns: clamp(3.75rem, 10cqh, 5.5rem) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(0.9rem, 2.5cqw, 1.4rem);
+  width: min(34rem, 80cqw);
+  padding: 0.65rem 0.85rem;
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.focus-mini-art {
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: var(--elevated);
+  color: var(--fg-muted);
+}
+.focus-mini-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.focus-mini-meta {
+  min-width: 0;
+}
+.focus-mini-title,
+.focus-mini-artist {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.focus-mini-title {
+  font-size: clamp(1rem, 3.4cqh, 1.35rem);
+  font-weight: 700;
+}
+.focus-mini-artist {
+  margin-top: 0.3rem;
+  color: var(--fg-muted);
+  font-size: clamp(0.8rem, 2.6cqh, 1rem);
+}
+.focus-mini-player.is-empty {
+  box-shadow: none;
+}
+
 /* ---- Dashboard layout ------------------------------------------------------
    Left: big clock (analog + digital) and date.
    Middle: music player. Right: vertical rail of pinned apps.                  */
@@ -1135,6 +1211,12 @@
     grid-template-rows: minmax(0, 1fr) minmax(0, 1.3fr);
     gap: 1.5rem;
     padding-top: 3.5rem;
+  }
+  .focus-stacked {
+    padding-inline: 1rem;
+  }
+  .focus-mini-player {
+    width: min(32rem, 88cqw);
   }
 }
 

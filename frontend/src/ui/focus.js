@@ -74,10 +74,42 @@ function FocusPlayer() {
   return root;
 }
 
+/** Compact metadata-only player used below the large clock. */
+function FocusMiniPlayer() {
+  const art = h('button', { class: 'focus-mini-art', 'aria-label': 'Open music app', onclick: () => actions.openMusicApp() });
+  const title = h('div', { class: 'focus-mini-title' });
+  const artist = h('div', { class: 'focus-mini-artist' });
+  const meta = h('div', { class: 'focus-mini-meta' }, title, artist);
+  const root = h('div', { class: 'focus-mini-player', 'aria-label': 'Now playing' }, art, meta);
+
+  let artUrl;
+  const render = () => {
+    const m = state.music;
+    const has = !!m?.hasSession && m.permission === 'granted';
+    root.classList.toggle('is-empty', !has);
+    title.textContent = has ? m.title || 'Unknown title' : 'No music playing';
+    artist.textContent = has ? m.artist || m.source?.label || '' : 'Open a music app to start listening';
+    artist.hidden = !artist.textContent;
+
+    const nextArt = has ? m.artwork : null;
+    if (nextArt !== artUrl || !art.childNodes.length) {
+      artUrl = nextArt;
+      art.replaceChildren(
+        artUrl ? h('img', { src: artUrl, alt: '', decoding: 'async', draggable: 'false' }) : icon('Music', '42%', 1.5),
+      );
+    }
+  };
+
+  watch(['music'], render);
+  render();
+  return root;
+}
+
 /**
  * Focus mode: full screen, no dock. Swipe between
  *  1. the clock alone, very large
  *  2. the clock beside a minimal player
+ *  3. a large centered clock with compact track metadata below it
  * Exit (top right) or Android Back returns home.
  */
 export function FocusView() {
@@ -88,6 +120,12 @@ export function FocusView() {
     h('div', { class: 'focus-cell' }, LargeTime()),
     h('div', { class: 'focus-cell' }, FocusPlayer()),
   );
+  const stackedPlayer = h(
+    'div',
+    { class: 'focus-page focus-stacked' },
+    h('div', { class: 'focus-stacked-clock' }, LargeTime('is-focus is-stacked')),
+    FocusMiniPlayer(),
+  );
   const exit = h(
     'button',
     { class: 'btn btn-icon focus-exit', 'aria-label': 'Exit focus mode', onclick: () => set({ view: 'home' }) },
@@ -96,7 +134,10 @@ export function FocusView() {
   return h(
     'section',
     { class: 'focus', 'aria-label': 'Focus mode' },
-    Pager([clockOnly, withPlayer], { key: 'monovra.focusPage', labels: ['Clock', 'Clock and music'] }),
+    Pager([clockOnly, withPlayer, stackedPlayer], {
+      key: 'monovra.focusPage',
+      labels: ['Clock', 'Clock and music', 'Clock with compact music'],
+    }),
     exit,
   );
 }
