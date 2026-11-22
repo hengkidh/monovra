@@ -11,6 +11,9 @@ files:
   - android/app/src/main/AndroidManifest.xml
   - android/app/src/main/java/id/hengki/monovra/MainActivity.kt
   - android/app/src/main/java/id/hengki/monovra/MonovraApp.kt
+  - android/app/src/main/res/drawable/ic_launcher*.xml
+  - android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+  - android/app/src/main/res/values/colors.xml
 entrypoints:
   - android/app/src/main/java/id/hengki/monovra/MainActivity.kt
   - android/app/src/main/java/id/hengki/monovra/MonovraApp.kt
@@ -24,7 +27,7 @@ data: []
 
 `MonovraApp` creates the process-wide repositories. `MainActivity` reads the saved theme before the first frame, loads the packaged frontend through `WebViewAssetLoader`, connects the native bridge, and forwards repository changes while the activity is started.
 
-The manifest registers the activity for both Home and ordinary launcher intents. Returning through a Home intent resets the frontend to its dashboard instead of creating another activity.
+The manifest registers the activity for both Home and ordinary launcher intents. Returning through a Home intent resets the frontend to its dashboard instead of creating another activity. The launcher identity uses an adaptive vector icon with a dedicated monochrome mask for Android themed icons.
 
 ## Gotchas
 - The WebView blocks network loads, arbitrary file access, external navigation, and untrusted bridge origins.

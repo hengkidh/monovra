@@ -118,6 +118,7 @@
   .app {
     height: 100vh;
     height: 100dvh;
+    touch-action: pan-x;
     display: grid;
     grid-template-rows: minmax(0, 1fr) auto;
     gap: 1.25rem;
@@ -951,7 +952,7 @@
 }
 
 /* ---- Focus mode -----------------------------------------------------------
-   Full screen, no dock. Clock-only, split music, and stacked compact music. */
+   Full screen, no dock. Clock-only, split, stacked, and ambient music. */
 .app.is-focus {
   grid-template-rows: minmax(0, 1fr);
   padding: 1rem 1.25rem 0.75rem;
@@ -1141,6 +1142,46 @@
 }
 .focus-mini-player.is-empty {
   box-shadow: none;
+}
+.focus-stacked-ambient {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: var(--radius-card);
+}
+.focus-stacked-ambient > :not(.focus-ambient) {
+  position: relative;
+  z-index: 1;
+}
+.focus-ambient {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.focus-ambient img {
+  position: absolute;
+  inset: -18%;
+  width: 136%;
+  height: 136%;
+  object-fit: cover;
+  filter: blur(54px) saturate(1.25);
+  opacity: 0.58;
+}
+.focus-ambient::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(110% 95% at 50% 35%, transparent 0%, var(--ambient-veil-edge) 100%),
+    linear-gradient(180deg, rgb(0 0 0 / 0.06), var(--ambient-veil-bottom));
+}
+.focus-stacked-ambient.has-ambient .focus-mini-player {
+  background: color-mix(in srgb, var(--surface) 78%, transparent);
+  backdrop-filter: blur(14px);
+}
+.focus-stacked-ambient.has-ambient .focus-mini-artist {
+  color: var(--ambient-muted);
 }
 
 /* ---- Dashboard layout ------------------------------------------------------

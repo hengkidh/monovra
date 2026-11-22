@@ -46,7 +46,10 @@ steps:
 
 The native window paints the saved theme before the WebView loads. The page renders its shell, then replaces default state with one bootstrap snapshot. Later repository changes arrive as events rather than polling.
 
+From the dashboard, an upward swipe opens the full-screen Focus view. A downward swipe from Focus returns to the dashboard; horizontal swipes remain reserved for changing clock and Focus layouts.
+
 ## Gotchas
 - Pressing Home while the activity is already in front emits a Home event that closes panels and returns to the dashboard.
+- Focus navigation accepts only a dominant vertical swipe to avoid interfering with horizontal page selection.
 - The first installed-app snapshot may initialize default shortcuts once; subsequent launches preserve the user's order.
 

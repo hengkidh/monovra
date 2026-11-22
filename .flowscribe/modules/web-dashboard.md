@@ -26,10 +26,11 @@ data: []
 
 The Vite-built single page connects to the native transport, registers event listeners, renders its shell, and requests a complete bootstrap snapshot. A small key-based store updates persistent view components for the dashboard, app drawer, focus mode, dock, and settings.
 
-The app drawer supports search and shortcut editing. The media panel adapts among permission, empty-session, and active-session states. Focus mode offers swipeable clock-only, clock-and-player, and centered-clock-with-compact-metadata layouts. Theme and favorites changes update optimistically before native persistence completes.
+The app drawer supports search and shortcut editing. The media panel adapts among permission, empty-session, and active-session states. A vertical swipe moves between Home and Focus mode, while horizontal swipes select among clock-only, clock-and-player, centered compact-metadata, and ambient-artwork layouts. Theme and favorites changes update optimistically before native persistence completes.
 
 ## Gotchas
 - Views are created lazily and hidden rather than rebuilt on every navigation.
+- Home-to-Focus gestures require a dominant vertical movement so they do not compete with horizontal pagers.
 - The development mock bridge is loaded only by the Vite development build.
 - The theme boot script applies the saved or requested theme before the main bundle paints.
 

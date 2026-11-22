@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Single-color mask used by Android themed icons. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="1024"
+    android:viewportHeight="1024">
+    <group
+        android:pivotX="512"
+        android:pivotY="512"
+        android:scaleX="0.86"
+        android:scaleY="0.86">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M138.225,647 L315.225,366 C321.892,355.333 331.892,350 345.225,350 H413.225 C423.225,350 430.892,354.333 436.225,363 L516.225,477 604.225,364 C611.558,354.667 620.892,350 632.225,350 H733.225 C752.558,350 756.225,358.667 744.225,376 L512.225,661 C503.558,671 494.892,670 486.225,658 L371.225,498 279.225,657 C273.225,667 264.558,672 253.225,672 H152.225 C134.225,672 129.558,663.667 138.225,647 Z" />
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M593.225,657 L771.225,437 C778.558,427.667 785.892,428.667 793.225,440 L848.225,523 C852.892,530.333 852.558,538.667 847.225,548 L755.225,663 C749.892,670.333 741.892,674 731.225,674 H605.225 C590.558,674 586.558,668.333 593.225,657 Z" />
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M861.225,617 A28,28 0,1 1,861.225 673 A28,28 0,1 1,861.225 617 Z" />
+    </group>
+</vector>

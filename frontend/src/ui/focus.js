@@ -75,7 +75,7 @@ function FocusPlayer() {
 }
 
 /** Compact metadata-only player used below the large clock. */
-function FocusMiniPlayer() {
+function FocusMiniPlayer({ onArtwork } = {}) {
   const art = h('button', { class: 'focus-mini-art', 'aria-label': 'Open music app', onclick: () => actions.openMusicApp() });
   const title = h('div', { class: 'focus-mini-title' });
   const artist = h('div', { class: 'focus-mini-artist' });
@@ -97,6 +97,7 @@ function FocusMiniPlayer() {
       art.replaceChildren(
         artUrl ? h('img', { src: artUrl, alt: '', decoding: 'async', draggable: 'false' }) : icon('Music', '42%', 1.5),
       );
+      onArtwork?.(artUrl);
     }
   };
 
@@ -110,6 +111,7 @@ function FocusMiniPlayer() {
  *  1. the clock alone, very large
  *  2. the clock beside a minimal player
  *  3. a large centered clock with compact track metadata below it
+ *  4. the same centered layout over blurred ambient artwork
  * Exit (top right) or Android Back returns home.
  */
 export function FocusView() {
@@ -126,6 +128,20 @@ export function FocusView() {
     h('div', { class: 'focus-stacked-clock' }, LargeTime('is-focus is-stacked')),
     FocusMiniPlayer(),
   );
+  const ambientArt = h('img', { alt: '', decoding: 'async', draggable: 'false' });
+  const ambient = h('div', { class: 'focus-ambient', 'aria-hidden': 'true', hidden: true }, ambientArt);
+  const ambientPlayer = h('div', { class: 'focus-page focus-stacked focus-stacked-ambient' }, ambient);
+  ambientPlayer.append(
+    h('div', { class: 'focus-stacked-clock' }, LargeTime('is-focus is-stacked')),
+    FocusMiniPlayer({
+      onArtwork: (artwork) => {
+        ambient.hidden = !artwork;
+        ambientPlayer.classList.toggle('has-ambient', !!artwork);
+        if (artwork) ambientArt.src = artwork;
+        else ambientArt.removeAttribute('src');
+      },
+    }),
+  );
   const exit = h(
     'button',
     { class: 'btn btn-icon focus-exit', 'aria-label': 'Exit focus mode', onclick: () => set({ view: 'home' }) },
@@ -134,9 +150,9 @@ export function FocusView() {
   return h(
     'section',
     { class: 'focus', 'aria-label': 'Focus mode' },
-    Pager([clockOnly, withPlayer, stackedPlayer], {
+    Pager([clockOnly, withPlayer, stackedPlayer, ambientPlayer], {
       key: 'monovra.focusPage',
-      labels: ['Clock', 'Clock and music', 'Clock with compact music'],
+      labels: ['Clock', 'Clock and music', 'Clock with compact music', 'Clock with ambient music'],
     }),
     exit,
   );

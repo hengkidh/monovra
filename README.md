@@ -7,9 +7,10 @@ Android car head units. Black, white and gray form the foundation, Indigo
 (`#4F46E5`) marks interaction, and album artwork is the only strong color.
 
 - Real Android launcher (`CATEGORY_HOME`), selectable as the default Home app
-- Two-column dashboard: big analog + digital clock with date on the left; music player with a shortcut row below it on the right
+- Three-part dashboard: swipeable clock on the left, music player in the center, and a vertical shortcut rail on the right
 - Live music from Android media sessions (YouTube Music first, Spotify and others work too)
-- Two themes, switched instantly from the home screen: **Full Black** and **Pure White**
+- Full-screen Focus Mode: swipe up from Home to enter, swipe down to return, and swipe horizontally across four clock/player layouts
+- Two themes, switched instantly from **Settings › Appearance**: **Full Black** and **Pure White**
 - Grayscale app icons, full-color album art
 - Works fully offline: no INTERNET permission, no backend, no analytics
 
@@ -79,7 +80,7 @@ monovra/
 │   ├── public/theme-boot.js      sets the saved theme before first paint
 │   └── src/
 │       ├── main.js  bridge.js  store.js  actions.js  dom.js  styles.css
-│       ├── ui/                   header, apps, music, dock, settings
+│       ├── ui/                   clock, apps, music, focus, dock, settings
 │       └── dev/mock-native.js    browser-only mock bridge (never in the APK)
 ├── docker/android.Dockerfile     JDK 17 + Android SDK 35 + Node 22 (Gradle 8.11 via android/gradlew)
 ├── docker-compose.yml            `web` (dev server) and `builder` (APK) services
@@ -307,8 +308,8 @@ adb shell input keyevent KEYCODE_WAKEUP
 ┌──────────── Android (Kotlin) ────────────┐        ┌────────── WebView (JS) ──────────┐
 │ AppRepository   PackageManager + package │        │ main.js   boot, events → store   │
 │                 broadcasts (no polling)  │ events │ store.js  tiny reactive state    │
-│ MediaRepository MediaSessionManager +    ├───────►│ ui/*      header, apps, music,   │
-│                 MediaController callbacks│        │           dock, settings         │
+│ MediaRepository MediaSessionManager +    ├───────►│ ui/*      clock, apps, music,    │
+│                 MediaController callbacks│        │           focus, dock, settings  │
 │ SettingsRepo    Jetpack DataStore        │◄───────┤ bridge.js request/response       │
 │ SystemActions   RoleManager, Settings    │ calls  │ styles.css Tailwind v4 + tokens  │
 │ NativeBridge    validation, dispatch     │        └──────────────────────────────────┘
@@ -455,6 +456,8 @@ adb shell am start -W -n id.hengki.monovra/.MainActivity   # TotalTime = cold st
 
 - [ ] `make apk` succeeds; app opens on 1024×600 and 1280×720 (`adb shell wm size 1024x600`, `wm size reset`)
 - [ ] Theme swatches switch instantly; theme persists after `am force-stop` with no flash on launch
+- [ ] Focus Mode swipes between clock-only, split player, centered compact player, and ambient artwork layouts
+- [ ] Swipe up from Home opens Focus Mode; swipe down from Focus returns Home without disrupting horizontal page swipes
 - [ ] Shortcuts open apps; All Apps search; pin/unpin; reorder in Settings › Applications
 - [ ] Install and uninstall an app while MONOVRA is open: the lists update
 - [ ] Without Notification Access → onboarding; after granting → music appears without restarting
