@@ -22,3 +22,9 @@ frontend/dist/
 keystore.properties
 .env
 keys/
+
+# flowscribe:start
+# Internal flowscribe documents, captures and storyboards: never committed.
+.flowscribe/private/
+.flowscribe/screens/
+# flowscribe:end

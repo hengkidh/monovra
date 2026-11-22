@@ -1,0 +1,22 @@
+# flowscribe install manifest. Used by install.sh to update and uninstall safely; do not edit.
+version 0.1.0
+agents created
+claude created
+claude-line added
+file 712148f945c0a79b68681e5d374eadee2219774223579b8d376fb6061644f3e5 .agents/skills/flowscribe-flow/SKILL.md
+file e973c70eedb6476b0034b353c8ca1f6b25103940dbb25bee95d4b90625a62d48 .agents/skills/flowscribe-handover/SKILL.md
+file 800bd29118a76acd6b8e85823046e2169933ec1e30973483b9084a99c564987b .agents/skills/flowscribe-init/SKILL.md
+file 39cf1189b938058bd7efc4e0f199735283708c6a66b97594083309b05c650f4b .agents/skills/flowscribe-sync/SKILL.md
+file 532d66eb0f86c2e3477cd40867d5a290349fbe27179eff461a3795d8b6a46518 .agents/skills/flowscribe-video/SKILL.md
+file 712148f945c0a79b68681e5d374eadee2219774223579b8d376fb6061644f3e5 .claude/skills/flowscribe-flow/SKILL.md
+file e973c70eedb6476b0034b353c8ca1f6b25103940dbb25bee95d4b90625a62d48 .claude/skills/flowscribe-handover/SKILL.md
+file 800bd29118a76acd6b8e85823046e2169933ec1e30973483b9084a99c564987b .claude/skills/flowscribe-init/SKILL.md
+file 39cf1189b938058bd7efc4e0f199735283708c6a66b97594083309b05c650f4b .claude/skills/flowscribe-sync/SKILL.md
+file 532d66eb0f86c2e3477cd40867d5a290349fbe27179eff461a3795d8b6a46518 .claude/skills/flowscribe-video/SKILL.md
+file be8d3943d75b6806a87c580c747437cd8093a14d18a3913fa8a08825d985a10c .flowscribe/config.yaml
+file 3b7825c32601f73d164a34fdbed66638d3000e8db836dacf0b20c794d807bd4a .flowscribe/schema/v1/document.schema.json
+file c8a2cc1c344c1001ce840dde2b5446095f0e1b7930074a117b0e596a77d20776 .flowscribe/schema/v1/index.schema.json
+file 961fddd08d1267e285fd18b4815b50eef15075b56a34884df4a573396d0fae5b .flowscribe/templates/decision.md
+file d03061f22011d7bd60207414a3edab6b52b1fe0c45e4958c7ec4b12ae84f65c7 .flowscribe/templates/flow.md
+file c5e35cf9137ad4d5d4f70fee4f805553021d1db2ee5bba8b30ba7b3e03fb5323 .flowscribe/templates/log.md
+file 16fe53453a49dfaca2ada44aa60b9e0458f6b0ee78067498740ba7ce2da1740f .flowscribe/templates/module.md
