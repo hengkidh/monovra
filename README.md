@@ -205,8 +205,10 @@ Signing is configured from environment variables:
 | `MONOVRA_KEY_PASSWORD` | key password |
 | `MONOVRA_VERSION_NAME` / `MONOVRA_VERSION_CODE` | optional version override |
 
-If no keystore is configured, the release build is signed with the **debug key** and Gradle prints a
-warning. That APK installs fine but is not suitable for public distribution.
+If no keystore is configured, a **local** release build is signed with the **debug key** and Gradle
+prints a warning. That APK installs fine but is not suitable for public distribution. The GitHub
+**Release APK** workflow never does this: it stops with an error if any of the four secrets in §7 is
+missing, because a CI debug key changes on every run and users could never update in place.
 
 Verify a signed APK:
 
