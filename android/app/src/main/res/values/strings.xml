@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MONOVRA</string>
+    <string name="notification_listener_label">MONOVRA media controls</string>
+    <string name="webview_outdated_title">Android System WebView is outdated</string>
+    <string name="webview_outdated_message">MONOVRA needs Android System WebView %1$d or newer. This device has version %2$s, so parts of the interface may not display correctly.\n\nUpdate \"Android System WebView\" from the Play Store or install a newer WebView APK, then restart MONOVRA.</string>
+    <string name="webview_outdated_update">Update WebView</string>
+    <string name="webview_outdated_continue">Continue anyway</string>
+    <string name="webview_missing">Android System WebView is not available on this device. MONOVRA cannot start.</string>
+</resources>

@@ -1,0 +1,24 @@
+# Build outputs
+dist/
+android/app/build/
+android/build/
+android/.gradle/
+android/.kotlin/
+android/local.properties
+android/app/src/main/assets/web/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# IDE / OS
+.idea/
+*.iml
+.DS_Store
+
+# Signing material — never commit
+*.jks
+*.keystore
+keystore.properties
+.env
+keys/

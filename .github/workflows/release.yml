@@ -1,0 +1,104 @@
+# Builds a signed release APK and attaches it to a GitHub Release.
+#
+# Trigger: push a tag like v0.1.0
+#   git tag v0.1.0 && git push origin v0.1.0
+#
+# Required repository secrets (Settings › Secrets and variables › Actions):
+#   MONOVRA_KEYSTORE_BASE64   base64 of the release .jks keystore
+#   MONOVRA_KEYSTORE_PASSWORD
+#   MONOVRA_KEY_ALIAS
+#   MONOVRA_KEY_PASSWORD
+# Without them the APK is signed with a throwaway debug key (installable, but
+# future updates signed with a real key will require uninstalling first).
+name: Release APK
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version name without the leading v (e.g. 0.1.0)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            NAME="${{ inputs.version }}"
+          else
+            NAME="${GITHUB_REF_NAME#v}"
+          fi
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          echo "tag=v$NAME" >> "$GITHUB_OUTPUT"
+          # Monotonic version code from the run number.
+          echo "code=$(( 100 + ${{ github.run_number }} ))" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm ci --no-audit --no-fund && npm run build
+
+      - name: Decode keystore
+        env:
+          KEYSTORE_B64: ${{ secrets.MONOVRA_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
+            echo "MONOVRA_KEYSTORE_FILE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
+          else
+            echo "::warning::No release keystore secret set; signing with a debug key."
+          fi
+
+      - name: Build release APK
+        working-directory: android
+        env:
+          MONOVRA_KEYSTORE_PASSWORD: ${{ secrets.MONOVRA_KEYSTORE_PASSWORD }}
+          MONOVRA_KEY_ALIAS: ${{ secrets.MONOVRA_KEY_ALIAS }}
+          MONOVRA_KEY_PASSWORD: ${{ secrets.MONOVRA_KEY_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleRelease \
+            -PversionName=${{ steps.version.outputs.name }} \
+            -PversionCode=${{ steps.version.outputs.code }}
+
+      - name: Prepare artifact
+        id: apk
+        run: |
+          OUT="monovra-${{ steps.version.outputs.tag }}.apk"
+          cp android/app/build/outputs/apk/release/app-release.apk "$OUT"
+          sha256sum "$OUT" > "$OUT.sha256"
+          echo "file=$OUT" >> "$GITHUB_OUTPUT"
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            gh release upload "$TAG" "${{ steps.apk.outputs.file }}" "${{ steps.apk.outputs.file }}.sha256" --clobber
+          else
+            gh release create "$TAG" "${{ steps.apk.outputs.file }}" "${{ steps.apk.outputs.file }}.sha256" \
+              --title "MONOVRA $TAG" --generate-notes --target "${{ github.sha }}"
+          fi

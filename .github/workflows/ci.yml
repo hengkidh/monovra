@@ -1,0 +1,39 @@
+# Builds the debug APK on every push and pull request, and keeps it as a
+# downloadable workflow artifact for 14 days.
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+    tags-ignore: ["v*"]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm ci --no-audit --no-fund && npm run build
+
+      - name: Build debug APK
+        working-directory: android
+        run: chmod +x gradlew && ./gradlew --no-daemon assembleDebug lintDebug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: monovra-debug-apk
+          path: android/app/build/outputs/apk/debug/*.apk
+          retention-days: 14

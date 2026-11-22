@@ -1,0 +1,46 @@
+# MONOVRA development environment.
+#
+#   docker compose up web                         # frontend dev server (browser preview, mock bridge)
+#   docker compose run --rm builder scripts/build.sh debug     # build debug APK
+#   docker compose run --rm builder scripts/build.sh release   # build release APK
+#
+# See README.md for details. The Makefile wraps these commands.
+
+services:
+  # Vite dev server for fast UI iteration in a desktop browser.
+  # Runs natively (arm64 or amd64) — it never touches the Android SDK.
+  web:
+    image: node:22.11.0-alpine
+    working_dir: /workspace/frontend
+    command: sh -c "npm ci --no-audit --no-fund && npm run dev -- --host 0.0.0.0 --port 5173"
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/workspace/frontend
+      - web_node_modules:/workspace/frontend/node_modules
+
+  # Full Android toolchain (JDK 17, Android SDK 35, Gradle, Node). amd64 only.
+  builder:
+    build:
+      context: ./docker
+      dockerfile: android.Dockerfile
+    image: monovra-builder:latest
+    platform: linux/amd64
+    working_dir: /workspace
+    environment:
+      # Optional release signing — see README "Signed release APK".
+      MONOVRA_KEYSTORE_FILE: ${MONOVRA_KEYSTORE_FILE:-}
+      MONOVRA_KEYSTORE_PASSWORD: ${MONOVRA_KEYSTORE_PASSWORD:-}
+      MONOVRA_KEY_ALIAS: ${MONOVRA_KEY_ALIAS:-}
+      MONOVRA_KEY_PASSWORD: ${MONOVRA_KEY_PASSWORD:-}
+      MONOVRA_VERSION_NAME: ${MONOVRA_VERSION_NAME:-}
+      MONOVRA_VERSION_CODE: ${MONOVRA_VERSION_CODE:-}
+    volumes:
+      - .:/workspace
+      - gradle_cache:/root/.gradle
+      - builder_node_modules:/workspace/frontend/node_modules
+
+volumes:
+  web_node_modules:
+  builder_node_modules:
+  gradle_cache:
