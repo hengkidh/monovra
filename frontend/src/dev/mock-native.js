@@ -23,13 +23,25 @@ const APPS = [
   ['com.vendor.radio', 'FM Radio', '#ff9800', true, false],
   ['com.vendor.carsettings', 'Car Settings', '#9c27b0', false, false],
   ['com.vendor.bluetooth', 'Bluetooth Phone With A Very Long Name', '#3f51b5', false, false],
-].map(([packageName, label, color, isMusic, isNavigation]) => ({
-  packageName,
-  label,
-  icon: svgIcon(label[0], color),
-  isMusic,
-  isNavigation,
-}));
+];
+
+// ?demo=store: for store screenshots. Real brands get generic labels (store
+// listings must not show third-party app names) and the track gets a short title
+// (the default is long on purpose, to test truncation).
+const STORE_DEMO = new URLSearchParams(location.search).get('demo') === 'store';
+const GENERIC_LABELS = {
+  'YT Music': 'Music',
+  Maps: 'Navigation',
+  Waze: 'Traffic',
+  Spotify: 'Podcasts',
+  Chrome: 'Browser',
+  WhatsApp: 'Messages',
+};
+
+const APP_LIST = APPS.map(([packageName, label, color, isMusic, isNavigation]) => {
+  const shown = STORE_DEMO ? GENERIC_LABELS[label] || label : label;
+  return { packageName, label: shown, icon: svgIcon(shown[0], color), isMusic, isNavigation };
+});
 
 const ART =
   'data:image/svg+xml,' +
@@ -46,14 +58,15 @@ export function createMockNative(receive) {
     favorites: ['com.google.android.apps.youtube.music', 'com.google.android.apps.maps', 'com.waze', 'com.android.settings'],
     preferredMusicApp: null,
   };
-  const scenario = new URLSearchParams(location.search).get('music') || 'playing'; // playing | empty | denied
+  const params = new URLSearchParams(location.search);
+  const scenario = params.get('music') || 'playing'; // playing | empty | denied
   let music = {
     permission: scenario === 'denied' ? 'denied' : 'granted',
     hasSession: scenario === 'playing',
-    source: { packageName: 'com.google.android.apps.youtube.music', label: 'YT Music' },
-    title: 'Midnight Highway (Extended Drive Mix) — a deliberately long title',
-    artist: 'The Mock Session Orchestra',
-    album: 'Dev Preview',
+    source: { packageName: 'com.google.android.apps.youtube.music', label: STORE_DEMO ? 'Music' : 'YT Music' },
+    title: STORE_DEMO ? 'Midnight Highway' : 'Midnight Highway (Extended Drive Mix) — a deliberately long title',
+    artist: STORE_DEMO ? 'Neon Avenue' : 'The Mock Session Orchestra',
+    album: STORE_DEMO ? 'Night Drive' : 'Dev Preview',
     artwork: ART,
     playback: 'playing',
     positionMs: 42_000,
@@ -83,7 +96,7 @@ export function createMockNative(receive) {
     getBootstrap: () => ({
       device: { manufacturer: 'Browser', model: 'Dev preview', androidVersion: '14', sdkInt: 34, appVersion: 'dev', webViewVersion: navigator.userAgent.match(/Chrome\/([\d.]+)/)?.[1] ?? null },
       settings,
-      apps: APPS,
+      apps: APP_LIST,
       music: snapshot(),
       system,
     }),
