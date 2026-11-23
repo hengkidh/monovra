@@ -131,6 +131,7 @@ Screenshots must use dummy data only (no real names or account details).
 | Section | Answer |
 | --- | --- |
 | Privacy policy | `https://github.com/hengkidh/monovra/blob/main/PRIVACY.md` |
+| Terms of service | `https://github.com/hengkidh/monovra/blob/main/TERMS.md` (not a Play Console field; link it where a form asks for terms, e.g. the website or support pages) |
 | Ads | No, the app contains no ads |
 | App access | All functionality is available without special access (no login) |
 | Content rating | Questionnaire: category "Utility, productivity, communication or other"; answer No to everything → Everyone / 3+ |

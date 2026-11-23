@@ -256,7 +256,7 @@ increases. You can also start the workflow manually (*Actions › Release APK �
 Each release tag also attaches `monovra-vX.Y.Z.aab` (Android App Bundle), the format Play Console
 requires. Build one locally with `make bundle` → `dist/monovra-release.aab`.
 Store listing text, Data safety answers and the release steps are in
-[`docs/play-store/listing.md`](docs/play-store/listing.md); the privacy policy is [`PRIVACY.md`](PRIVACY.md).
+[`docs/play-store/listing.md`](docs/play-store/listing.md); the privacy policy is [`PRIVACY.md`](PRIVACY.md) and the terms of service are [`TERMS.md`](TERMS.md).
 
 ---
 
