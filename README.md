@@ -128,6 +128,7 @@ track so the layout can be designed in a desktop browser. Use the device toolbar
 | `/?music=playing` | a playing track (default) |
 | `/?music=empty`   | idle state ("Nothing playing" + music-app buttons) |
 | `/?music=denied`  | Notification Access onboarding |
+| `/?nav=on`        | Fake turn-by-turn navigation (next-turn card and dock chip) |
 | `/?theme=white` / `black` / `auto` | start in a theme (`auto` follows the browser's color scheme) |
 
 The mock exists only in `vite dev`; production builds never contain it.
@@ -460,7 +461,7 @@ adb shell am start -W -n id.hengki.monovra/.MainActivity   # TotalTime = cold st
 
 | Topic | Details |
 | --- | --- |
-| **Notification Access** | Required by Android to read media sessions of other apps. MONOVRA does not read notifications. Granted by the user in Settings. |
+| **Notification Access** | Required by Android to read media sessions of other apps. Also used to read the ongoing turn-by-turn notification of Google Maps or Waze (next-turn card); other notifications are ignored. Granted by the user in Settings. |
 | **Android 13+ restricted settings** | For sideloaded APKs the Notification Access switch may be greyed out. Open *App info › ⋮ › Allow restricted settings*, then enable access. MONOVRA links to both screens. |
 | **Default launcher** | Uses `RoleManager.ROLE_HOME` (Android 10+) with fallback to Home/Default-apps settings. Some head-unit firmwares hide these screens or force their own launcher on boot; MONOVRA cannot and will not bypass that. |
 | **Vendor launchers** | Some units relaunch the factory launcher after sleep or reverse camera. Press Home again; MONOVRA never disables the factory launcher. |

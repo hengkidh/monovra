@@ -6,6 +6,7 @@ export const state = {
   settings: { theme: 'black', favorites: [], preferredMusicApp: null },
   apps: [],
   music: null,
+  navigation: { active: false },
   system: { isDefaultLauncher: false, homeRoleAvailable: false, notificationAccess: false, sdkInt: 0, nightMode: null },
   view: 'home', // home | focus | apps | settings
   settingsSection: 'appearance',

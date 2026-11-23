@@ -41,6 +41,7 @@ import id.hengki.monovra.settings.MonovraTheme
 import id.hengki.monovra.settings.ThemePreference
 import id.hengki.monovra.system.SystemActions
 import id.hengki.monovra.web.ArtworkPathHandler
+import id.hengki.monovra.web.NavArrowPathHandler
 import id.hengki.monovra.web.IconPathHandler
 import id.hengki.monovra.web.notFound
 import kotlinx.coroutines.flow.combine
@@ -114,6 +115,7 @@ class MainActivity : ComponentActivity() {
             .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
             .addPathHandler("/icon/", IconPathHandler(app.icons))
             .addPathHandler("/art/", ArtworkPathHandler(app.media))
+            .addPathHandler("/nav/", NavArrowPathHandler(app.navigation))
             .build()
 
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG) // chrome://inspect in debug builds only
@@ -236,6 +238,7 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch { app.media.state.collect { bridge.pushEvent("music", it.toJson()) } }
+                launch { app.navigation.state.collect { bridge.pushEvent("navigation", it.toJson()) } }
                 launch { app.apps.apps.collect { bridge.pushEvent("apps", bridge.appsJson()) } }
                 launch {
                     app.settingsState.collect { s ->

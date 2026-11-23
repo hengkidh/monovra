@@ -5,7 +5,7 @@ id: media-control
 title: Media session control
 summary: Selects an active Android media session, publishes track state and artwork, and performs supported playback controls.
 status: active
-updated: 2026-11-23
+updated: 2026-11-24
 kind: feature
 files:
   - android/app/src/main/java/id/hengki/monovra/media/**
@@ -25,7 +25,7 @@ data: [MusicState]
 Artwork is scaled, encoded, and held in memory behind an opaque local token. Playback commands are sent only when the selected session advertises support for the requested action.
 
 ## Gotchas
-- Reading sessions requires the user-granted Notification Access special permission; the listener service does not read or retain notifications.
+- Reading sessions requires the user-granted Notification Access special permission. The listener also forwards Google Maps and Waze navigation notifications to the navigation-turns module; other notifications are ignored and nothing is retained.
 - Changing the preferred player triggers immediate session reselection.
 - Artwork work is canceled when selection changes, and stale results are ignored.
 

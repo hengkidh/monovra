@@ -24,7 +24,7 @@ import org.json.JSONObject
  *                          { "type": "response", "id": 7, "ok": false, "error": { "code": "NOT_INSTALLED", "message": "..." } }
  * Event    (native → JS):  { "type": "event", "event": "music", "data": {...} }
  *
- * Events: music, apps, settings, system, back, home.
+ * Events: music, navigation, apps, settings, system, back, home.
  * Only methods in [dispatch] exist. Every argument is validated.
  */
 class NativeBridge(
@@ -45,6 +45,7 @@ class NativeBridge(
         "getDeviceInfo" -> deviceInfo()
         "getInstalledApps" -> appsJson()
         "getMusicState" -> app.media.state.value.toJson()
+        "getNavigationState" -> app.navigation.state.value.toJson()
         "getSystemStatus" -> systemStatus()
         "launchApp" -> launchApp(requirePackage(p))
         "playPause" -> control { app.media.playPause() }
@@ -104,6 +105,7 @@ class NativeBridge(
         .put("settings", app.settingsState.value.toJson())
         .put("apps", appsJson())
         .put("music", app.media.state.value.toJson())
+        .put("navigation", app.navigation.state.value.toJson())
         .put("system", systemStatus())
 
     fun deviceInfo(): JSONObject = JSONObject()

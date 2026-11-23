@@ -1,5 +1,6 @@
 import { h } from '../dom.js';
-import { watch } from '../store.js';
+import { state, watch } from '../store.js';
+import { NextTurnCard } from './navigation.js';
 import { Pager } from './pager.js';
 
 const SVG = 'http://www.w3.org/2000/svg';
@@ -237,9 +238,17 @@ export function ClockPanel() {
   );
   const page1 = h('div', { class: 'clock-page' }, analog.el, small.el);
   const page2 = h('div', { class: 'clock-page' }, LargeTime());
-  return h(
-    'section',
-    { class: 'clock-panel', 'aria-label': 'Clock' },
-    Pager([page1, page2], { key: 'monovra.clockPage', labels: ['Analog clock', 'Large clock'] }),
-  );
+  const pager = Pager([page1, page2], { key: 'monovra.clockPage', labels: ['Analog clock', 'Large clock'] });
+  // While a navigation app shows a turn, the next turn takes the clock's place.
+  const turn = NextTurnCard();
+  const section = h('section', { class: 'clock-panel', 'aria-label': 'Clock' }, pager, turn);
+  const render = () => {
+    const navigating = !!state.navigation?.active;
+    pager.hidden = navigating;
+    turn.hidden = !navigating;
+    section.setAttribute('aria-label', navigating ? 'Next turn' : 'Clock');
+  };
+  watch(['navigation'], render);
+  render();
+  return section;
 }

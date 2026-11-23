@@ -5,7 +5,7 @@ id: android-launcher-host
 title: Android launcher host
 summary: Hosts the bundled dashboard in a locked-down WebView and coordinates launcher lifecycle, state streams, and system bars.
 status: active
-updated: 2026-11-23
+updated: 2026-11-24
 kind: feature
 files:
   - android/app/src/main/AndroidManifest.xml
@@ -18,7 +18,7 @@ entrypoints:
   - android/app/src/main/java/id/hengki/monovra/MainActivity.kt
   - android/app/src/main/java/id/hengki/monovra/MonovraApp.kt
   - android/app/src/main/AndroidManifest.xml
-depends_on: [native-bridge, app-catalog, media-control, launcher-settings]
+depends_on: [native-bridge, app-catalog, media-control, launcher-settings, navigation-turns]
 env: []
 data: []
 ---

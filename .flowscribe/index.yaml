@@ -32,6 +32,10 @@ modules:
     path: .flowscribe/modules/native-bridge.md
     summary: Validates and routes the restricted request, response, and event protocol between the dashboard and Android services.
     status: active
+  - id: navigation-turns
+    path: .flowscribe/modules/navigation-turns.md
+    summary: Reads the ongoing Google Maps or Waze turn-by-turn notification and publishes the next manoeuvre and its arrow to the dashboard.
+    status: active
   - id: web-dashboard
     path: .flowscribe/modules/web-dashboard.md
     summary: Renders the driving dashboard, app drawer, media controls, focus view, dock, and settings from reactive native state.
@@ -45,6 +49,10 @@ flows:
     path: .flowscribe/flows/control-current-music.md
     summary: The driver views the selected media session and sends only playback commands supported by the current player.
     status: active
+  - id: follow-next-turn
+    path: .flowscribe/flows/follow-next-turn.md
+    summary: While Google Maps or Waze navigates, the driver sees the next turn on the dashboard or dock and can tap it to open the navigation app.
+    status: active
   - id: launch-installed-app
     path: .flowscribe/flows/launch-installed-app.md
     summary: The driver selects a shortcut or app-drawer tile and Android opens the validated installed package.
@@ -57,4 +65,8 @@ flows:
     path: .flowscribe/flows/open-launcher-dashboard.md
     summary: The driver opens Home and receives a themed dashboard populated from native launcher, app, media, and system state.
     status: active
-decisions: []
+decisions:
+  - id: next-turn-from-notifications
+    path: .flowscribe/decisions/0001-next-turn-from-notifications.md
+    summary: The next turn comes from the Google Maps or Waze ongoing notification, not from an embedded map, GPS or network tiles.
+    status: accepted

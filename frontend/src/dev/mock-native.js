@@ -43,6 +43,14 @@ const APP_LIST = APPS.map(([packageName, label, color, isMusic, isNavigation]) =
   return { packageName, label: shown, icon: svgIcon(shown[0], color), isMusic, isNavigation };
 });
 
+// ?nav=on: fake a Google Maps turn-by-turn notification that counts down.
+const ARROW =
+  'data:image/svg+xml,' +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">' +
+      '<path d="M7 21v-8a4 4 0 0 1 4-4h8"/><path d="M15 5l4 4-4 4"/></svg>',
+  );
+
 const ART =
   'data:image/svg+xml,' +
   encodeURIComponent(
@@ -86,6 +94,25 @@ export function createMockNative(receive) {
     system.nightMode = e.matches;
     emit('system', { ...system });
   });
+  let navStep = 0;
+  const NAV_STEPS = [450, 300, 200, 120, 60, 30];
+  const navigation = () =>
+    params.get('nav') === 'on'
+      ? {
+          active: true,
+          source: { packageName: 'com.google.android.apps.maps', label: STORE_DEMO ? 'Navigation' : 'Maps' },
+          distance: `${NAV_STEPS[navStep % NAV_STEPS.length]} m`,
+          instruction: 'Turn right onto Merdeka Street',
+          eta: '18 min · 8.4 km · 14:32 arrival',
+          arrow: ARROW,
+        }
+      : { active: false };
+  if (params.get('nav') === 'on') {
+    setInterval(() => {
+      navStep++;
+      emit('navigation', navigation());
+    }, 3000);
+  }
   const emit = (event, data) => setTimeout(() => receive({ type: 'event', event, data }), 30);
   const snapshot = () => {
     const pos = music.playback === 'playing' ? music.positionMs + (Date.now() - music.capturedAt) : music.positionMs;
@@ -98,6 +125,7 @@ export function createMockNative(receive) {
       settings,
       apps: APP_LIST,
       music: snapshot(),
+      navigation: navigation(),
       system,
     }),
     setTheme: ({ theme }) => {
@@ -131,6 +159,7 @@ export function createMockNative(receive) {
       emit('music', snapshot());
       return { done: true };
     },
+    getNavigationState: () => navigation(),
     launchApp: ({ packageName }) => (console.info('[mock] launch', packageName), { launched: packageName }),
     openMusicApp: () => (console.info('[mock] open music app'), {}),
     requestHomeRole: () => {

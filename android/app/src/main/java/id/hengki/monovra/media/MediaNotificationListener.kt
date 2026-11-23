@@ -1,19 +1,36 @@
 package id.hengki.monovra.media
 
 import android.service.notification.NotificationListenerService
+import android.service.notification.StatusBarNotification
 import id.hengki.monovra.MonovraApp
 
 /**
- * Exists only so Android allows MediaSessionManager.getActiveSessions() for
- * MONOVRA after the user grants Notification Access. Notifications are never
- * read or stored. The system binds/unbinds this service; it does no work.
+ * Bound by Android after the user grants Notification Access. It serves two
+ * purposes:
+ *  1. it lets MediaSessionManager.getActiveSessions() work for MONOVRA;
+ *  2. it forwards the ongoing turn-by-turn notification of Google Maps or Waze
+ *     to [id.hengki.monovra.navigation.NavigationRepository].
+ * Notifications from any other app are ignored without being read, and
+ * nothing is stored on disk.
  */
 class MediaNotificationListener : NotificationListenerService() {
+    private val app get() = application as? MonovraApp
+
     override fun onListenerConnected() {
-        (application as? MonovraApp)?.media?.onAccessChanged()
+        app?.media?.onAccessChanged()
+        app?.navigation?.resync(try { activeNotifications } catch (_: SecurityException) { null })
     }
 
     override fun onListenerDisconnected() {
-        (application as? MonovraApp)?.media?.onAccessChanged()
+        app?.media?.onAccessChanged()
+        app?.navigation?.clear()
+    }
+
+    override fun onNotificationPosted(sbn: StatusBarNotification) {
+        app?.navigation?.onPosted(sbn)
+    }
+
+    override fun onNotificationRemoved(sbn: StatusBarNotification) {
+        app?.navigation?.onRemoved(sbn)
     }
 }

@@ -5,6 +5,7 @@ import androidx.webkit.WebViewAssetLoader
 import id.hengki.monovra.apps.IconProvider
 import id.hengki.monovra.bridge.Validation
 import id.hengki.monovra.media.MediaRepository
+import id.hengki.monovra.navigation.NavigationRepository
 import java.io.ByteArrayInputStream
 
 /**
@@ -12,6 +13,7 @@ import java.io.ByteArrayInputStream
  *
  *   https://appassets.androidplatform.net/icon/<packageName>.png
  *   https://appassets.androidplatform.net/art/<token>.jpg
+ *   https://appassets.androidplatform.net/nav/<token>.png
  *
  * Inputs are validated; nothing maps to arbitrary files or content URIs.
  */
@@ -30,6 +32,15 @@ class ArtworkPathHandler(private val media: MediaRepository) : WebViewAssetLoade
         val token = pattern.matchEntire(path)?.groupValues?.get(1)?.toLongOrNull() ?: return notFound()
         val bytes = media.artworkBytes(token) ?: return notFound()
         return ok("image/jpeg", bytes, immutable = true)
+    }
+}
+
+class NavArrowPathHandler(private val navigation: NavigationRepository) : WebViewAssetLoader.PathHandler {
+    private val pattern = Regex("^(\\d{1,18})\\.png$")
+    override fun handle(path: String): WebResourceResponse? {
+        val token = pattern.matchEntire(path)?.groupValues?.get(1)?.toLongOrNull() ?: return notFound()
+        val bytes = navigation.arrowBytes(token) ?: return notFound()
+        return ok("image/png", bytes, immutable = true)
     }
 }
 

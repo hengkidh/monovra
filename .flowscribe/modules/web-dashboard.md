@@ -5,7 +5,7 @@ id: web-dashboard
 title: Web dashboard
 summary: Renders the driving dashboard, app drawer, media controls, focus view, dock, and settings from reactive native state.
 status: active
-updated: 2026-11-23
+updated: 2026-11-24
 kind: feature
 files:
   - frontend/index.html
@@ -19,7 +19,7 @@ entrypoints:
   - frontend/src/ui/settings.js
   - frontend/src/ui/dock.js
   - frontend/src/ui/focus.js
-depends_on: [native-bridge, app-catalog, media-control, launcher-settings]
+depends_on: [native-bridge, app-catalog, media-control, launcher-settings, navigation-turns]
 env: []
 data: []
 ---

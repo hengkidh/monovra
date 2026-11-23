@@ -5,6 +5,7 @@ import android.content.ComponentCallbacks2
 import id.hengki.monovra.apps.AppRepository
 import id.hengki.monovra.apps.IconProvider
 import id.hengki.monovra.media.MediaRepository
+import id.hengki.monovra.navigation.NavigationRepository
 import id.hengki.monovra.settings.MonovraSettings
 import id.hengki.monovra.settings.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
@@ -29,6 +30,8 @@ class MonovraApp : Application() {
         private set
     lateinit var media: MediaRepository
         private set
+    lateinit var navigation: NavigationRepository
+        private set
 
     override fun onCreate() {
         super.onCreate()
@@ -37,6 +40,7 @@ class MonovraApp : Application() {
         apps = AppRepository(this, appScope).also { it.start() }
         icons = IconProvider(packageManager, apps)
         media = MediaRepository(this, appScope, apps) { settingsState.value.preferredMusicApp }
+        navigation = NavigationRepository(this, appScope) { pkg -> apps.find(pkg)?.label ?: pkg }
     }
 
     @Suppress("DEPRECATION")

@@ -5,7 +5,7 @@ id: native-bridge
 title: Native web bridge
 summary: Validates and routes the restricted request, response, and event protocol between the dashboard and Android services.
 status: active
-updated: 2026-11-23
+updated: 2026-11-24
 kind: shared
 files:
   - android/app/src/main/java/id/hengki/monovra/bridge/**
@@ -16,7 +16,7 @@ entrypoints:
   - android/app/src/main/java/id/hengki/monovra/bridge/NativeBridge.kt
   - frontend/src/bridge.js
   - frontend/src/actions.js
-depends_on: [app-catalog, media-control, launcher-settings]
+depends_on: [app-catalog, media-control, launcher-settings, navigation-turns]
 env: []
 data: []
 ---

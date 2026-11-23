@@ -16,6 +16,7 @@ async function boot() {
 
   // Native pushes state changes; no polling.
   on('music', (music) => set({ music }));
+  on('navigation', (navigation) => set({ navigation: navigation || { active: false } }));
   on('apps', (apps) => set({ apps }));
   on('system', (system) => {
     set({ system });
@@ -36,7 +37,7 @@ async function boot() {
   if (kind === 'none') return;
   try {
     const b = await call('getBootstrap');
-    set({ device: b.device, settings: b.settings, apps: b.apps, music: b.music, system: b.system });
+    set({ device: b.device, settings: b.settings, apps: b.apps, music: b.music, navigation: b.navigation || { active: false }, system: b.system });
     actions.applyTheme();
   } catch (e) {
     console.error('Bootstrap failed', e);

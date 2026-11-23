@@ -3,6 +3,7 @@ import { state, watch, set, musicApp } from '../store.js';
 import { actions } from '../actions.js';
 import { LargeTime, onClock } from './clock.js';
 import { Pager } from './pager.js';
+import { NextTurnCard, NextTurnChip, WhileNavigating } from './navigation.js';
 
 /**
  * Calm "now playing" block for focus mode: cover, title, artist, progress and
@@ -153,27 +154,31 @@ export function FocusView() {
     'div',
     { class: 'focus-page focus-split' },
     h('div', { class: 'focus-cell' }, LargeTime()),
-    h('div', { class: 'focus-cell' }, FocusPlayer()),
+    h('div', { class: 'focus-cell' }, WhileNavigating(FocusPlayer(), NextTurnCard(), 'is-focus-card')),
   );
   const stackedPlayer = h(
     'div',
     { class: 'focus-page focus-stacked' },
     h('div', { class: 'focus-stacked-clock' }, LargeTime('is-focus is-stacked')),
-    FocusMiniPlayer(),
+    WhileNavigating(FocusMiniPlayer(), NextTurnChip({ always: true, cls: 'is-focus-mini' }), 'is-focus-mini'),
   );
   const ambientArt = h('img', { alt: '', decoding: 'async', draggable: 'false' });
   const ambient = h('div', { class: 'focus-ambient', 'aria-hidden': 'true', hidden: true }, ambientArt);
   const ambientPlayer = h('div', { class: 'focus-page focus-stacked focus-stacked-ambient' }, ambient);
   ambientPlayer.append(
     h('div', { class: 'focus-stacked-clock' }, LargeTime('is-focus is-stacked')),
-    FocusMiniPlayer({
-      onArtwork: (artwork) => {
-        ambient.hidden = !artwork;
-        ambientPlayer.classList.toggle('has-ambient', !!artwork);
-        if (artwork) ambientArt.src = artwork;
-        else ambientArt.removeAttribute('src');
-      },
-    }),
+    WhileNavigating(
+      FocusMiniPlayer({
+        onArtwork: (artwork) => {
+          ambient.hidden = !artwork;
+          ambientPlayer.classList.toggle('has-ambient', !!artwork);
+          if (artwork) ambientArt.src = artwork;
+          else ambientArt.removeAttribute('src');
+        },
+      }),
+      NextTurnChip({ always: true, cls: 'is-focus-mini' }),
+      'is-focus-mini',
+    ),
   );
   const exit = h(
     'button',

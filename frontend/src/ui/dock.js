@@ -2,6 +2,7 @@ import { h, icon } from '../dom.js';
 import { state, watch, set, musicApp, navigationApp } from '../store.js';
 import { actions } from '../actions.js';
 import { THEMES } from './settings.js';
+import { NextTurnChip } from './navigation.js';
 
 /** Bottom dock: Home · Focus · Music · Navigation · All Apps · Settings | Dark · Light · Auto. */
 export function Dock() {
@@ -49,6 +50,7 @@ export function Dock() {
   return h(
     'nav',
     { class: 'dock card', 'aria-label': 'Dock' },
+    NextTurnChip(),
     home,
     focus,
     music,

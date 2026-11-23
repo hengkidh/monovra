@@ -29,6 +29,11 @@ HOME DASHBOARD
 • Now playing card with album art and play, pause, previous and next controls for your music app
 • Your favourite apps (navigation, music, radio) one tap away
 
+NEXT TURN AT A GLANCE
+• While Google Maps or Waze is navigating, the next turn (arrow, distance and street) replaces the clock
+• In Focus mode it takes the music player's place, and on other screens it stays visible in the dock
+• Turns into a bold highlight in the last metres before the turn; tap it to open your navigation app
+
 FOCUS MODE
 • Swipe up for a full-screen view without the dock
 • Choose a clock-only, clock-and-player, stacked or ambient album-art layout
@@ -42,12 +47,12 @@ MADE FOR THE CAR
 PRIVATE AND OFFLINE
 • No internet permission: everything runs on your device
 • No ads, no analytics, no tracking, no account
-• Notification Access is used only to find the music session that is playing; notification content is never read or stored
+• Notification Access is used to find the music session that is playing and to show the next turn from Google Maps or Waze; other notifications are never read, and nothing is stored or sent
 
 HOW TO USE
 1. Install MONOVRA and open it.
 2. Set it as your Home app when Android asks (or in Settings › Apps › Default apps › Home app).
-3. Allow Notification Access to show and control the song that is playing.
+3. Allow Notification Access to show and control the song that is playing and to show the next turn.
 
 MONOVRA works on Android 10 and newer. It is a regular Android launcher for head units and tablets; it is not an Android Auto or Android Automotive OS app.
 ```
@@ -78,6 +83,11 @@ DASHBOARD UTAMA
 • Kartu lagu yang sedang diputar dengan sampul album serta tombol putar, jeda, sebelumnya, dan berikutnya
 • Aplikasi favorit (navigasi, musik, radio) cukup satu ketukan
 
+BELOKAN BERIKUTNYA SEKILAS PANDANG
+• Saat Google Maps atau Waze sedang navigasi, belokan berikutnya (panah, jarak, dan nama jalan) menggantikan jam
+• Di mode Focus tampil menggantikan pemutar musik, dan di layar lain tetap terlihat di dock
+• Berubah jadi sorotan tebal di meter-meter terakhir sebelum belok; ketuk untuk membuka aplikasi navigasi
+
 MODE FOCUS
 • Geser ke atas untuk tampilan layar penuh tanpa dock
 • Pilih tata letak jam saja, jam + pemutar, bertumpuk, atau ambient dengan sampul album
@@ -91,12 +101,12 @@ DIBUAT UNTUK MOBIL
 PRIVAT DAN OFFLINE
 • Tanpa izin internet: semuanya berjalan di perangkat Anda
 • Tanpa iklan, tanpa analitik, tanpa pelacakan, tanpa akun
-• Akses Notifikasi hanya dipakai untuk menemukan sesi musik yang sedang diputar; isi notifikasi tidak pernah dibaca atau disimpan
+• Akses Notifikasi dipakai untuk menemukan sesi musik yang sedang diputar dan menampilkan belokan berikutnya dari Google Maps atau Waze; notifikasi lain tidak pernah dibaca, dan tidak ada yang disimpan atau dikirim
 
 CARA PAKAI
 1. Pasang MONOVRA lalu buka.
 2. Jadikan aplikasi Home saat Android bertanya (atau di Setelan › Aplikasi › Aplikasi default › Aplikasi layar utama).
-3. Izinkan Akses Notifikasi agar lagu yang sedang diputar bisa ditampilkan dan dikontrol.
+3. Izinkan Akses Notifikasi agar lagu yang sedang diputar bisa ditampilkan dan dikontrol, serta belokan berikutnya bisa ditampilkan.
 
 MONOVRA berjalan di Android 10 ke atas. Ini launcher Android biasa untuk head unit dan tablet, bukan aplikasi Android Auto atau Android Automotive OS.
 ```
@@ -109,7 +119,7 @@ MONOVRA berjalan di Android 10 ke atas. Ini launcher Android biasa untuk head un
 | --- | --- | --- |
 | App icon | 512 × 512 PNG, 32-bit, ≤ 1 MB | Export from `assets/branding/` |
 | Feature graphic | 1024 × 500 PNG/JPG, no transparency | To make (logo + one dashboard screenshot) |
-| Tablet screenshots (7" and 10") | min. 2, 16:9 landscape, 1080 px+ on the short side recommended | `screenshots-empty/` (re-export at full size if needed) |
+| Tablet screenshots (7" and 10") | min. 2, 16:9 landscape, 1080 px+ on the short side recommended | `screenshots/` (1920 × 1080; `7-` and `8-` show the next turn, added in v0.4.0) |
 | Phone screenshots | min. 2 | Same landscape screenshots are accepted |
 
 Screenshots must use dummy data only (no real names or account details).
@@ -143,7 +153,8 @@ Screenshots must use dummy data only (no real names or account details).
 
 Why "No" is correct: the manifest has no `INTERNET` permission, so nothing leaves the device.
 Android's definition of "collect" means transmitting data off the device; processing on the
-device only (app list, media session) is not collection.
+device only (app list, media session, the Google Maps/Waze navigation notification) is not
+collection. Still "No" after the next-turn feature (v0.4.0).
 
 ---
 
@@ -172,3 +183,21 @@ device only (app list, media session) is not collection.
 6. Apply for production access, then promote the build to **Production**.
 7. Check the target API level warning on upload; raise `compileSdk` / `targetSdk` in
    `android/app/build.gradle.kts` if Play requires a newer level.
+
+---
+
+## 8. Release notes ("What's new", ≤ 500 characters)
+
+### v0.4.0
+
+English:
+
+```
+New: next turn at a glance. While Google Maps or Waze is navigating, MONOVRA shows the next turn (arrow, distance and street) in place of the clock, instead of the music player in Focus mode, and in the dock on other screens. Tap it to open your navigation app. Everything stays on your device; only the navigation notification of these two apps is read.
+```
+
+Bahasa Indonesia:
+
+```
+Baru: belokan berikutnya sekilas pandang. Saat Google Maps atau Waze sedang navigasi, MONOVRA menampilkan belokan berikutnya (panah, jarak, dan nama jalan) menggantikan jam, menggantikan pemutar musik di mode Focus, dan di dock pada layar lain. Ketuk untuk membuka aplikasi navigasi. Semua tetap di perangkat; hanya notifikasi navigasi dua aplikasi ini yang dibaca.
+```
