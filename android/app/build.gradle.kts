@@ -19,12 +19,12 @@ val hasReleaseKeystore = keystoreFile?.exists() == true
 
 android {
     namespace = "id.hengki.monovra"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "id.hengki.monovra"
         minSdk = 29
-        targetSdk = 35
+        targetSdk = 36
         versionCode = monovraVersionCode
         versionName = monovraVersionName
     }

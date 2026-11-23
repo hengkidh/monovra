@@ -83,7 +83,7 @@ monovra/
 │       ├── main.js  bridge.js  store.js  actions.js  dom.js  styles.css
 │       ├── ui/                   clock, apps, music, focus, dock, settings
 │       └── dev/mock-native.js    browser-only mock bridge (never in the APK)
-├── docker/android.Dockerfile     JDK 17 + Android SDK 35 + Node 22 (Gradle 8.11 via android/gradlew)
+├── docker/android.Dockerfile     JDK 17 + Android SDK 36 + Node 22 (Gradle 8.11 via android/gradlew)
 ├── docker-compose.yml            `web` (dev server) and `builder` (APK) services
 ├── scripts/build.sh              frontend build + Gradle assemble + copy to dist/
 ├── Makefile                      shortcuts for the commands below
