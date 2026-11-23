@@ -158,6 +158,9 @@
     scroll-snap-type: x mandatory;
     overscroll-behavior-x: contain;
     scrollbar-width: none;
+    /* Only horizontal panning belongs to the pager. Without this the browser
+       claims vertical drags too and cancels the Home/Focus swipe. */
+    touch-action: pan-x;
   }
   .pager-track::-webkit-scrollbar {
     display: none;
@@ -854,7 +857,9 @@
     min-height: max(3.1rem, 48px);
     max-width: 13rem;
     padding: 0.35rem 1rem 0.35rem 0.4rem;
-    border-radius: 999px;
+    /* Square app icons: a soft rectangle instead of a pill, concentric with
+       the icon's own corners (icon radius + inner padding). */
+    border-radius: 14px;
     background: var(--elevated);
     color: var(--fg);
     font-weight: 600;
@@ -872,6 +877,8 @@
     width: 2.3rem;
     height: 2.3rem;
     flex: none;
+    border-radius: 8px;
+    overflow: hidden;
   }
   .idle-app-label {
     overflow: hidden;

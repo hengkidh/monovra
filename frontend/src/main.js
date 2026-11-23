@@ -48,27 +48,39 @@ function goBack() {
   if (state.view !== 'home') return set({ view: 'home', query: '' });
 }
 
-/** Swipe up from Home to enter Focus; swipe down from Focus to return Home. */
+/**
+ * Swipe up from Home to enter Focus; swipe down from Focus to return Home.
+ * Decided while the finger moves (no need to lift), with forgiving limits for
+ * slow or slightly diagonal swipes on a moving car's touch screen.
+ */
 function installFocusSwipe(target) {
-  const minDistance = 72;
+  const minDistance = 48;
+  const maxDuration = 1500;
   let gesture = null;
 
-  target.addEventListener('pointerdown', (event) => {
-    if (!event.isPrimary || (state.view !== 'home' && state.view !== 'focus')) return;
-    gesture = { id: event.pointerId, x: event.clientX, y: event.clientY, startedAt: performance.now() };
-  });
-  target.addEventListener('pointercancel', () => (gesture = null));
-  target.addEventListener('pointerup', (event) => {
+  const decide = (event) => {
     if (!gesture || event.pointerId !== gesture.id) return;
     const dx = event.clientX - gesture.x;
     const dy = event.clientY - gesture.y;
-    const elapsed = performance.now() - gesture.startedAt;
+    if (performance.now() - gesture.startedAt > maxDuration) return (gesture = null);
+    if (Math.abs(dy) < minDistance || Math.abs(dy) < Math.abs(dx)) return;
     gesture = null;
-
-    if (elapsed > 900 || Math.abs(dy) < minDistance || Math.abs(dy) < Math.abs(dx) * 1.25) return;
     if (state.view === 'home' && dy < 0) set({ view: 'focus' });
     else if (state.view === 'focus' && dy > 0) set({ view: 'home' });
+  };
+
+  target.addEventListener('pointerdown', (event) => {
+    if (!event.isPrimary || (state.view !== 'home' && state.view !== 'focus')) return;
+    // Vertical lists scroll on their own; a swipe there is a scroll, not navigation.
+    if (event.target.closest?.('.scroll, input, textarea')) return (gesture = null);
+    gesture = { id: event.pointerId, x: event.clientX, y: event.clientY, startedAt: performance.now() };
   });
+  target.addEventListener('pointermove', decide);
+  target.addEventListener('pointerup', (event) => {
+    decide(event);
+    gesture = null;
+  });
+  target.addEventListener('pointercancel', () => (gesture = null));
 }
 
 function render() {
