@@ -9,6 +9,9 @@ const svg = (tag, attrs = {}) => {
   return el;
 };
 
+/** Mirrors the global CSS rule that turns every animation off. */
+const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)');
+
 /** Outer edge shared by every dial mark (hour ticks, minor ticks, minute dots). */
 const OUTER = 12;
 
@@ -68,7 +71,11 @@ function AnalogClock() {
       const hr = (date.getHours() % 12) + m / 60;
       hour.setAttribute('transform', `rotate(${hr * 30} 100 100)`);
       minute.setAttribute('transform', `rotate(${m * 6} 100 100)`);
-      second.setAttribute('transform', `rotate(${sec * 6} 100 100)`);
+      // Exactly one driver for the second hand. While the CSS sweep runs, the
+      // stepped transform attribute must stay off: older Android WebViews paint
+      // both on attribute changes, which shows as a doubled (ghost) hand.
+      if (REDUCED_MOTION.matches) second.setAttribute('transform', `rotate(${sec * 6} 100 100)`);
+      else second.removeAttribute('transform');
     },
   };
 }
@@ -80,10 +87,23 @@ function AnalogClock() {
 const tickSubs = new Set();
 const syncSubs = new Set();
 let tickTimer = 0;
+// Wall clock vs. monotonic clock at the previous tick. CSS animations follow the
+// monotonic clock, which stops while a head unit sleeps (ACC off, quick boot)
+// and ignores system time corrections (GPS/NTP). When the two clocks disagree,
+// the sweeps no longer match the real time and must be re-aligned.
+let lastWall = 0;
+let lastMono = 0;
+const DRIFT_MS = 750;
 
 function loop() {
   const now = new Date();
+  const mono = performance.now();
+  const drift = Math.abs(now.getTime() - lastWall - (mono - lastMono));
+  const jumped = lastWall !== 0 && drift > DRIFT_MS;
+  lastWall = now.getTime();
+  lastMono = mono;
   tickSubs.forEach((f) => f(now));
+  if (jumped) syncSubs.forEach((f) => f(now));
   clearTimeout(tickTimer);
   // Next wake-up right after the next whole second.
   tickTimer = setTimeout(loop, 1000 - now.getMilliseconds() + 15);
@@ -102,6 +122,10 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 watch(['view'], () => requestAnimationFrame(resync));
+REDUCED_MOTION.addEventListener?.('change', () => {
+  loop();
+  resync();
+});
 
 /** Calls `tick(now)` every second and `sync(now)` whenever sweeps must re-align. */
 export function onClock(tick, sync) {
