@@ -88,34 +88,53 @@ function FocusPlayer() {
   return root;
 }
 
-/** Compact metadata-only player used below the large clock. */
+/**
+ * Compact metadata-only player used below the large clock. When nothing plays
+ * it shows the same record illustration as the other idle states, with one
+ * "Open <app>" action, kept on a single row so the clock stays the anchor.
+ */
 function FocusMiniPlayer({ onArtwork } = {}) {
   const art = h('button', { class: 'focus-mini-art', 'aria-label': 'Open music app', onclick: () => actions.openMusicApp() });
   const title = h('div', { class: 'focus-mini-title' });
   const artist = h('div', { class: 'focus-mini-artist' });
   const meta = h('div', { class: 'focus-mini-meta' }, title, artist);
-  const root = h('div', { class: 'focus-mini-player', 'aria-label': 'Now playing' }, art, meta);
+  const openLabel = h('span');
+  const openBtn = h(
+    'button',
+    { class: 'idle-app is-primary focus-mini-open', onclick: () => actions.openMusicApp(musicApp()?.packageName) },
+    icon('Play', '1.1rem', 2.25),
+    openLabel,
+  );
+  const root = h('div', { class: 'focus-mini-player', 'aria-label': 'Now playing' }, art, meta, openBtn);
 
-  let artUrl;
+  let artKey;
   const render = () => {
     const m = state.music;
     const has = !!m?.hasSession && m.permission === 'granted';
     root.classList.toggle('is-empty', !has);
-    title.textContent = has ? m.title || 'Unknown title' : 'No music playing';
-    artist.textContent = has ? m.artist || m.source?.label || '' : 'Open a music app to start listening';
+    title.textContent = has ? m.title || 'Unknown title' : 'Nothing playing';
+    artist.textContent = has ? m.artist || m.source?.label || '' : 'Start a song to see it here.';
     artist.hidden = !artist.textContent;
 
-    const nextArt = has ? m.artwork : null;
-    if (nextArt !== artUrl || !art.childNodes.length) {
-      artUrl = nextArt;
-      art.replaceChildren(
-        artUrl ? h('img', { src: artUrl, alt: '', decoding: 'async', draggable: 'false' }) : icon('Music', '42%', 1.5),
-      );
-      onArtwork?.(artUrl);
+    openBtn.hidden = has;
+    if (!has) {
+      const app = musicApp();
+      openLabel.textContent = app ? `Open ${app.label}` : 'Open music';
+      openBtn.disabled = !app;
+    }
+
+    const artwork = has ? m.artwork || null : null;
+    const nextKey = has ? artwork || 'placeholder' : 'idle';
+    if (nextKey !== artKey) {
+      artKey = nextKey;
+      if (artwork) art.replaceChildren(h('img', { src: artwork, alt: '', decoding: 'async', draggable: 'false' }));
+      else if (has) art.replaceChildren(icon('Music', '42%', 1.5));
+      else art.replaceChildren(h('span', { class: 'idle-disc is-mini', 'aria-hidden': 'true' }, h('span', { class: 'idle-disc-label' }, icon('Music', '46%', 2))));
+      onArtwork?.(artwork);
     }
   };
 
-  watch(['music'], render);
+  watch(['music', 'apps', 'settings'], render);
   render();
   return root;
 }

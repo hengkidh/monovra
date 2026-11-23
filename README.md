@@ -9,8 +9,9 @@ Android car head units. Black, white and gray form the foundation, Indigo
 - Real Android launcher (`CATEGORY_HOME`), selectable as the default Home app
 - Three-part dashboard: swipeable clock on the left, music player in the center, and a vertical shortcut rail on the right
 - Live music from Android media sessions (YouTube Music first, Spotify and others work too)
-- Full-screen Focus Mode: swipe up from Home to enter, swipe down to return, and swipe horizontally across four clock/player layouts
-- Two themes, switched instantly from **Settings › Appearance**: **Full Black** and **Pure White**
+- Full-screen Focus Mode: swipe up from Home to enter, swipe down to return, and swipe horizontally across four clock/player layouts, including an edge-to-edge ambient layout over blurred album art
+- Three theme modes, switched instantly from the dock or **Settings › Appearance**: **Dark** (true black), **Light** (pure white) and **Auto**, which follows Android's day/night (dark mode) setting
+- A calm idle state when nothing is playing, with one-tap buttons for the installed music apps
 - Grayscale app icons, full-color album art
 - Works fully offline: no INTERNET permission, no backend, no analytics
 
@@ -125,9 +126,9 @@ track so the layout can be designed in a desktop browser. Use the device toolbar
 | URL | Shows |
 | --- | --- |
 | `/?music=playing` | a playing track (default) |
-| `/?music=empty`   | "No music playing" state |
+| `/?music=empty`   | idle state ("Nothing playing" + music-app buttons) |
 | `/?music=denied`  | Notification Access onboarding |
-| `/?theme=white` / `black` | start in a theme |
+| `/?theme=white` / `black` / `auto` | start in a theme (`auto` follows the browser's color scheme) |
 
 The mock exists only in `vite dev`; production builds never contain it.
 
@@ -325,10 +326,18 @@ adb shell input keyevent KEYCODE_WAKEUP
   the app has no INTERNET permission.
 - **Kotlin owns Android integration**; the frontend is pure UI. No frameworks: vanilla ES modules,
   Tailwind compiled at build time, Lucide icons tree-shaken (only the icons used are bundled).
-- **Themes**: CSS custom properties under `html[data-theme]`. A tap swaps the attribute
-  (instant, no reload) and Kotlin persists it in DataStore. On launch Kotlin reads the theme before
-  creating the WebView, paints the window in that color and passes `?theme=` to the page, where
-  `theme-boot.js` applies it before the first paint, so there's no flash of the wrong theme.
+- **Themes**: CSS custom properties under `html[data-theme]` (`black` or `white`). The stored
+  preference is `black`, `white` or `auto`; a tap swaps the attribute (instant, no reload) and Kotlin
+  persists the preference in DataStore. `auto` resolves from Android's night mode: Kotlin handles
+  `uiMode` in `onConfigurationChanged`, repaints the window and system bars, and pushes a `system`
+  event with `nightMode` so the page switches too, without recreating the activity. On launch Kotlin
+  resolves the theme before creating the WebView, paints the window in that color and passes
+  `?theme=` to the page, where `theme-boot.js` applies it before the first paint, so there's no
+  flash of the wrong theme.
+- **Clock**: the analog second hand and the seconds bar sweep with CSS animations. A once-per-second
+  ticker compares the wall clock with the monotonic clock and re-aligns the sweeps whenever they
+  disagree (head-unit sleep, GPS/NTP time correction). The second hand has a single driver, the CSS
+  sweep, or a stepped transform when reduced motion is on, so older WebViews never paint a doubled hand.
 - **Icons** come from `PackageManager`, rendered to 144 px PNGs, cached in an LRU (3 MB) and shown
   grayscale with CSS `filter: grayscale(100%)`. Album art is never filtered.
 - **Music**: `MediaSessionManager.getActiveSessions()` (allowed by the notification listener
@@ -372,11 +381,11 @@ trusted origin. Navigation away from the bundled page is blocked either way.
 | `getDeviceInfo` | – | manufacturer, model, androidVersion, sdkInt, appVersion, webViewVersion |
 | `getInstalledApps` | – | `App[]` |
 | `getMusicState` | – | `MusicState` |
-| `getSystemStatus` | – | `{ isDefaultLauncher, homeRoleAvailable, notificationAccess, sdkInt }` |
+| `getSystemStatus` | – | `{ isDefaultLauncher, homeRoleAvailable, notificationAccess, sdkInt, nightMode }` |
 | `launchApp` | `packageName` | `{ launched }` |
 | `playPause` / `nextTrack` / `previousTrack` | – | `{ done }` |
 | `openMusicApp` | `packageName?` | opens the session's player, else the preferred/YT Music/Spotify app |
-| `setTheme` | `theme`: `black` \| `white` | `{ theme }` |
+| `setTheme` | `theme`: `black` \| `white` \| `auto` | `{ theme }` |
 | `setFavorites` | `packages: string[]` (≤ 32, ordered) | `{ favorites }` |
 | `setPreferredMusicApp` | `packageName \| null` | `{ preferredMusicApp }` |
 | `requestHomeRole` | – | opens the RoleManager dialog (fallback: Home settings) |
@@ -393,7 +402,9 @@ MusicState = { permission: "granted"|"denied", hasSession, source: {packageName,
                playback: "playing"|"paused"|"buffering"|"stopped"|"none",
                positionMs, durationMs /* -1 = unknown */, speed, capturedAt /* epoch ms */,
                actions: { playPause, next, previous } }
-Settings   = { theme, favorites: string[], preferredMusicApp: string|null }
+Settings   = { theme: "black"|"white"|"auto", favorites: string[], preferredMusicApp: string|null }
+System     = { isDefaultLauncher, homeRoleAvailable, notificationAccess, sdkInt,
+               nightMode /* Android dark mode, resolves the "auto" theme */ }
 ```
 
 Validation: messages > 16 KB are dropped; method names are whitelisted; package names must match
@@ -406,7 +417,7 @@ Error codes: `BAD_REQUEST`, `UNKNOWN_METHOD`, `INVALID_ARGUMENT`, `NOT_INSTALLED
 ## 11. Performance and profiling
 
 Design choices for 2–4 GB head units: single WebView, no frameworks, no background or foreground
-services, no polling (package broadcasts and media callbacks), one 1 s timer for the analog second hand (paused when hidden)
+services, no polling (package broadcasts and media callbacks), one shared 1 s clock timer (paused when hidden; the second hand itself sweeps on the GPU)
 and one per second for progress *only while playing and visible*, icons/artwork resized natively,
 caches trimmed in `onTrimMemory`, release build minified with R8.
 
@@ -455,14 +466,16 @@ adb shell am start -W -n id.hengki.monovra/.MainActivity   # TotalTime = cold st
 ## 13. Testing checklist
 
 - [ ] `make apk` succeeds; app opens on 1024×600 and 1280×720 (`adb shell wm size 1024x600`, `wm size reset`)
-- [ ] Theme swatches switch instantly; theme persists after `am force-stop` with no flash on launch
-- [ ] Focus Mode swipes between clock-only, split player, centered compact player, and ambient artwork layouts
+- [ ] Dark / Light / Auto in the dock switch instantly; the choice persists after `am force-stop` with no flash on launch
+- [ ] Auto follows day/night: `adb shell cmd uimode night yes` / `night no` switches the page and system bars without a restart
+- [ ] Analog second hand: one hand only, matches the digital seconds, and is still aligned after sleep/wake
+- [ ] Focus Mode swipes between clock-only, split player, centered compact player, and ambient artwork layouts; the ambient artwork fills the screen edge to edge with the clock centered
 - [ ] Swipe up from Home opens Focus Mode; swipe down from Focus returns Home without disrupting horizontal page swipes
 - [ ] Shortcuts open apps; All Apps search; pin/unpin; reorder in Settings › Applications
 - [ ] Install and uninstall an app while MONOVRA is open: the lists update
 - [ ] Without Notification Access → onboarding; after granting → music appears without restarting
 - [ ] YouTube Music: title/artist/art/progress, play/pause/next/prev, tap art opens the player
-- [ ] Pause stops progress; skipping resyncs; no music → "No music playing" + Open Music
+- [ ] Pause stops progress; skipping resyncs; no music → "Nothing playing" with buttons for the installed music apps
 - [ ] Set as default launcher; Home button returns to the dashboard; Back closes panels only
 - [ ] Sleep/wake (`KEYCODE_SLEEP` / `KEYCODE_WAKEUP`) restores state and music
 - [ ] Idle CPU ≈ 0% and memory stable over a long drive
