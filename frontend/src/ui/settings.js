@@ -10,9 +10,10 @@ const SECTIONS = [
   { id: 'about', label: 'About', icon: 'Info' },
 ];
 
-const THEMES = [
-  { id: 'black', label: 'Full Black', hint: 'True black for night driving' },
-  { id: 'white', label: 'Pure White', hint: 'Bright and clean' },
+export const THEMES = [
+  { id: 'black', label: 'Dark', icon: 'Moon', hint: 'True black for night driving' },
+  { id: 'white', label: 'Light', icon: 'Sun', hint: 'Bright and clean' },
+  { id: 'auto', label: 'Auto', icon: 'SunMoon', hint: 'Follows Android dark mode (day/night)' },
 ];
 
 const heading = (text, sub) =>

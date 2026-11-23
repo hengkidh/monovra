@@ -30,5 +30,6 @@ Modern WebViews use an origin-restricted message listener. Older supported WebVi
 ## Gotchas
 - Events emitted before `getBootstrap` are intentionally dropped; bootstrap is the readiness boundary.
 - Requests have size, method-name, package-name, favorites-count, and installed-package checks.
+- `setTheme` accepts `black`, `white`, or `auto`. The `system` event includes `nightMode` so the page can resolve `auto`.
 - The frontend gives each request an eight-second timeout and turns known bridge errors into driver-facing messages.
 

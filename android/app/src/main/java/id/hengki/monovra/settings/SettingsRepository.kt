@@ -20,7 +20,7 @@ import java.io.IOException
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "monovra_settings")
 
 data class MonovraSettings(
-    val theme: MonovraTheme = MonovraTheme.DEFAULT,
+    val theme: ThemePreference = ThemePreference.DEFAULT,
     /** Ordered list of pinned package names. */
     val favorites: List<String> = emptyList(),
     /** False until the first-run default shortcuts have been chosen. */
@@ -47,7 +47,7 @@ class SettingsRepository(private val context: Context) {
         .catch { e -> if (e is IOException) emit(emptyPreferences()) else throw e }
         .map { p ->
             MonovraSettings(
-                theme = MonovraTheme.fromId(p[Keys.THEME]) ?: MonovraTheme.DEFAULT,
+                theme = ThemePreference.fromId(p[Keys.THEME]) ?: ThemePreference.DEFAULT,
                 favorites = p[Keys.FAVORITES]?.split(',')?.filter { it.isNotBlank() } ?: emptyList(),
                 favoritesInitialized = p[Keys.FAVORITES_INITIALIZED] ?: false,
                 preferredMusicApp = p[Keys.PREFERRED_MUSIC]?.takeIf { it.isNotBlank() },
@@ -57,7 +57,7 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun current(): MonovraSettings = settings.first()
 
-    suspend fun setTheme(theme: MonovraTheme) {
+    suspend fun setTheme(theme: ThemePreference) {
         context.dataStore.edit { it[Keys.THEME] = theme.id }
     }
 

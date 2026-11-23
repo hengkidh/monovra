@@ -62,7 +62,17 @@ export function createMockNative(receive) {
     capturedAt: Date.now(),
     actions: { playPause: true, next: true, previous: true },
   };
-  const system = { isDefaultLauncher: false, homeRoleAvailable: true, notificationAccess: scenario !== 'denied', sdkInt: 34 };
+  const system = {
+    isDefaultLauncher: false,
+    homeRoleAvailable: true,
+    notificationAccess: scenario !== 'denied',
+    sdkInt: 34,
+    nightMode: window.matchMedia('(prefers-color-scheme: dark)').matches,
+  };
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', (e) => {
+    system.nightMode = e.matches;
+    emit('system', { ...system });
+  });
   const emit = (event, data) => setTimeout(() => receive({ type: 'event', event, data }), 30);
   const snapshot = () => {
     const pos = music.playback === 'playing' ? music.positionMs + (Date.now() - music.capturedAt) : music.positionMs;

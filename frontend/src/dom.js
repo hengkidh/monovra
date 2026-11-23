@@ -8,8 +8,10 @@ import {
   Check,
   Disc3,
   Focus,
+  Headphones,
   House,
   Info,
+  Moon,
   LayoutGrid,
   Music,
   Navigation,
@@ -24,6 +26,8 @@ import {
   Settings,
   SkipBack,
   SkipForward,
+  Sun,
+  SunMoon,
   X,
 } from 'lucide';
 
@@ -37,8 +41,10 @@ const ICONS = {
   Check,
   Disc3,
   Focus,
+  Headphones,
   House,
   Info,
+  Moon,
   LayoutGrid,
   Music,
   Navigation,
@@ -53,6 +59,8 @@ const ICONS = {
   Settings,
   SkipBack,
   SkipForward,
+  Sun,
+  SunMoon,
   X,
 };
 

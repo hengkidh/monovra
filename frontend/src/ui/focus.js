@@ -1,5 +1,5 @@
 import { h, icon, formatTime } from '../dom.js';
-import { state, watch, set } from '../store.js';
+import { state, watch, set, musicApp } from '../store.js';
 import { actions } from '../actions.js';
 import { LargeTime, onClock } from './clock.js';
 import { Pager } from './pager.js';
@@ -25,7 +25,16 @@ function FocusPlayer() {
     h('div', { class: 'focus-progress' }, bar, h('div', { class: 'times' }, elapsed, duration)),
     play,
   );
-  const empty = h('div', { class: 'focus-empty' }, icon('Music', '2rem', 1.5), h('span', { text: 'No music playing' }));
+  // Idle: the same record illustration as the home card, with one calm action.
+  const openLabel = h('span');
+  const openBtn = h('button', { class: 'idle-app is-primary', onclick: () => actions.openMusicApp(musicApp()?.packageName) }, icon('Play', '1.1rem', 2.25), openLabel);
+  const empty = h(
+    'div',
+    { class: 'idle focus-empty' },
+    h('div', { class: 'idle-disc', 'aria-hidden': 'true' }, h('span', { class: 'idle-disc-label' }, icon('Music', '42%', 1.75))),
+    h('div', { class: 'idle-text' }, h('div', { class: 'idle-title', text: 'Nothing playing' }), h('p', { class: 'idle-sub', text: 'Start a song to see it here.' })),
+    openBtn,
+  );
   const root = h('div', { class: 'focus-player' }, art, info, empty);
 
   let artUrl;
@@ -49,7 +58,12 @@ function FocusPlayer() {
     const has = !!m?.hasSession && m.permission === 'granted';
     art.hidden = info.hidden = !has;
     empty.hidden = has;
-    if (!has) return;
+    if (!has) {
+      const app = musicApp();
+      openLabel.textContent = app ? `Open ${app.label}` : 'Open music';
+      openBtn.disabled = !app;
+      return;
+    }
 
     title.textContent = m.title || 'Unknown title';
     artist.textContent = m.artist || '';
@@ -68,7 +82,7 @@ function FocusPlayer() {
     progress();
   };
 
-  watch(['music'], render);
+  watch(['music', 'apps', 'settings'], render);
   render();
   onClock(progress);
   return root;

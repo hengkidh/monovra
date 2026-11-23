@@ -3,6 +3,7 @@ package id.hengki.monovra
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
@@ -37,6 +38,7 @@ import id.hengki.monovra.bridge.NativeBridge
 import id.hengki.monovra.bridge.isHomeIntent
 import id.hengki.monovra.settings.MonovraSettings
 import id.hengki.monovra.settings.MonovraTheme
+import id.hengki.monovra.settings.ThemePreference
 import id.hengki.monovra.system.SystemActions
 import id.hengki.monovra.web.ArtworkPathHandler
 import id.hengki.monovra.web.IconPathHandler
@@ -63,7 +65,8 @@ class MainActivity : ComponentActivity() {
     private var replyProxy: JavaScriptReplyProxy? = null
     private var useLegacyBridge = false
     @Volatile private var trustedPageLoaded = false
-    private var currentTheme = MonovraTheme.DEFAULT
+    private var themePreference = ThemePreference.DEFAULT
+    private var currentTheme = MonovraTheme.BLACK
 
     private val homeRoleLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         pushSystemStatus()
@@ -76,7 +79,8 @@ class MainActivity : ComponentActivity() {
         // Read the saved theme synchronously (DataStore, a few ms) so the very
         // first frame already has the right background: no wrong-theme flash.
         val initial = runBlocking { withTimeoutOrNull(600) { app.settings.current() } } ?: MonovraSettings()
-        currentTheme = initial.theme
+        themePreference = initial.theme
+        currentTheme = themePreference.resolve(resources.configuration)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
         root = FrameLayout(this)
@@ -235,10 +239,8 @@ class MainActivity : ComponentActivity() {
                 launch { app.apps.apps.collect { bridge.pushEvent("apps", bridge.appsJson()) } }
                 launch {
                     app.settingsState.collect { s ->
-                        if (s.theme != currentTheme) {
-                            currentTheme = s.theme
-                            applyWindowTheme(s.theme)
-                        }
+                        themePreference = s.theme
+                        refreshWindowTheme()
                         bridge.pushEvent("settings", s.toJson())
                     }
                 }
@@ -254,6 +256,22 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun pushSystemStatus() = bridge.pushEvent("system", bridge.systemStatus())
+
+    /** Re-resolves the theme (e.g. "auto" after a day/night switch) and repaints the window. */
+    private fun refreshWindowTheme() {
+        val resolved = themePreference.resolve(resources.configuration)
+        if (resolved != currentTheme) {
+            currentTheme = resolved
+            applyWindowTheme(resolved)
+        }
+    }
+
+    // uiMode is in configChanges, so a day/night switch lands here instead of recreating.
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        refreshWindowTheme()
+        pushSystemStatus() // the page resolves "auto" from system.nightMode
+    }
 
     private fun applyWindowTheme(theme: MonovraTheme) {
         window.setBackgroundDrawable(ColorDrawable(theme.background))

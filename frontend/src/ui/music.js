@@ -1,5 +1,5 @@
-import { h, icon, formatTime } from '../dom.js';
-import { state, watch, musicApp } from '../store.js';
+import { h, icon, appIcon, formatTime } from '../dom.js';
+import { state, watch, set, musicApp } from '../store.js';
 import { actions } from '../actions.js';
 
 /**
@@ -60,6 +60,61 @@ export function MusicPanel() {
     ];
   }
 
+  /**
+   * Nothing is playing: a quiet record illustration, one line of guidance and
+   * one-tap launchers for the installed music apps (the usual one first).
+   */
+  function idleState() {
+    const preferred = musicApp();
+    const apps = [preferred, ...state.apps.filter((a) => a.isMusic && a !== preferred)].filter(Boolean).slice(0, 4);
+    const disc = h(
+      'div',
+      { class: 'idle-disc', 'aria-hidden': 'true' },
+      h('span', { class: 'idle-disc-label' }, icon('Music', '42%', 1.75)),
+    );
+    const launchers = apps.length
+      ? h(
+          'div',
+          { class: 'idle-apps' },
+          ...apps.map((app, i) =>
+            h(
+              'button',
+              {
+                class: `idle-app ${i === 0 ? 'is-primary' : ''}`,
+                'aria-label': `Open ${app.label}`,
+                onclick: () => actions.openMusicApp(app.packageName),
+              },
+              appIcon(app, 'idle-app-icon'),
+              h('span', { class: 'idle-app-label', text: app.label }),
+              i === 0 && icon('Play', '1rem', 2.25),
+            ),
+          ),
+        )
+      : h(
+          'button',
+          { class: 'btn', onclick: () => set({ view: 'apps', editShortcuts: false }) },
+          icon('LayoutGrid', '1.1rem'),
+          'All apps',
+        );
+    return h(
+      'div',
+      { class: 'idle' },
+      disc,
+      h(
+        'div',
+        { class: 'idle-text' },
+        h('div', { class: 'idle-title', text: 'Nothing playing' }),
+        h('p', {
+          class: 'idle-sub',
+          text: apps.length
+            ? 'Start a song and it shows up here with its controls.'
+            : 'No music app found. Install one, or open All apps.',
+        }),
+      ),
+      launchers,
+    );
+  }
+
   function render() {
     const m = state.music;
     clearTimeout(timer);
@@ -95,22 +150,7 @@ export function MusicPanel() {
 
     if (!m.hasSession) {
       mode = null;
-      const app = musicApp();
-      root.replaceChildren(
-        ...emptyState({
-          iconName: 'Music',
-          heading: 'No music playing',
-          body: null,
-          buttons: [
-            h(
-              'button',
-              { class: 'btn btn-primary', disabled: !app, onclick: () => app && actions.openMusicApp(app.packageName) },
-              icon('Play', '1.1rem'),
-              'Open Music',
-            ),
-          ],
-        }),
-      );
+      root.replaceChildren(idleState());
       return;
     }
 

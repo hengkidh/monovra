@@ -17,10 +17,13 @@ async function boot() {
   // Native pushes state changes; no polling.
   on('music', (music) => set({ music }));
   on('apps', (apps) => set({ apps }));
-  on('system', (system) => set({ system }));
+  on('system', (system) => {
+    set({ system });
+    actions.applyTheme(); // "auto" follows Android day/night
+  });
   on('settings', (settings) => {
-    actions.applyTheme(settings.theme);
     set({ settings });
+    actions.applyTheme();
   });
   on('back', goBack);
   on('home', () => {
@@ -33,8 +36,8 @@ async function boot() {
   if (kind === 'none') return;
   try {
     const b = await call('getBootstrap');
-    actions.applyTheme(b.settings.theme);
     set({ device: b.device, settings: b.settings, apps: b.apps, music: b.music, system: b.system });
+    actions.applyTheme();
   } catch (e) {
     console.error('Bootstrap failed', e);
   }

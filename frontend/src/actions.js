@@ -21,9 +21,22 @@ async function run(method, params) {
   }
 }
 
-function applyTheme(theme) {
-  document.documentElement.dataset.theme = theme;
+const SYSTEM_DARK = window.matchMedia('(prefers-color-scheme: dark)');
+
+/**
+ * The color theme to paint: a fixed choice, or for "auto" Android's dark mode
+ * (pushed by native as system.nightMode; the browser preference in dev).
+ */
+export function resolveTheme(pref = state.settings.theme) {
+  if (pref === 'black' || pref === 'white') return pref;
+  const night = typeof state.system.nightMode === 'boolean' ? state.system.nightMode : SYSTEM_DARK.matches;
+  return night ? 'black' : 'white';
 }
+
+function applyTheme(pref) {
+  document.documentElement.dataset.theme = resolveTheme(pref);
+}
+SYSTEM_DARK.addEventListener?.('change', () => applyTheme());
 
 export const actions = {
   applyTheme,

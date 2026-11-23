@@ -7,7 +7,8 @@ import androidx.webkit.WebViewCompat
 import id.hengki.monovra.BuildConfig
 import id.hengki.monovra.MonovraApp
 import id.hengki.monovra.apps.KnownApps
-import id.hengki.monovra.settings.MonovraTheme
+import id.hengki.monovra.settings.ThemePreference
+import id.hengki.monovra.settings.isNight
 import id.hengki.monovra.system.SystemActions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -110,6 +111,8 @@ class NativeBridge(
         .put("model", Build.MODEL)
         .put("androidVersion", Build.VERSION.RELEASE)
         .put("sdkInt", Build.VERSION.SDK_INT)
+        // Android dark mode, used by the page to resolve the "auto" theme.
+        .put("nightMode", app.resources.configuration.isNight())
         .put("appVersion", BuildConfig.VERSION_NAME)
         .put("appVersionCode", BuildConfig.VERSION_CODE)
         .put("webViewVersion", WebViewCompat.getCurrentWebViewPackage(app)?.versionName ?: JSONObject.NULL)
@@ -149,7 +152,7 @@ class NativeBridge(
     }
 
     private suspend fun setTheme(p: JSONObject): JSONObject {
-        val theme = MonovraTheme.fromId(p.optString("theme"))
+        val theme = ThemePreference.fromId(p.optString("theme"))
             ?: throw BridgeException(BridgeError.INVALID_ARGUMENT, "Unknown theme")
         app.settings.setTheme(theme)
         return JSONObject().put("theme", theme.id)

@@ -32,5 +32,6 @@ The manifest registers the activity for both Home and ordinary launcher intents.
 ## Gotchas
 - The WebView blocks network loads, arbitrary file access, external navigation, and untrusted bridge origins.
 - A lost WebView renderer is recreated; repository state is then obtained again through bootstrap.
+- `uiMode` is handled in `onConfigurationChanged`: with the Auto theme, a day/night switch repaints the window and system bars and pushes a fresh `system` event, without recreating the activity.
 - Media observation starts and stops with activity visibility so head-unit sleep does not leave active listeners or timers.
 
