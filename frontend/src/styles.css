@@ -345,9 +345,9 @@
   /* Smooth sweeping second hand: one turn per minute, aligned from JS via a
      negative animation-delay. With reduced motion the global rule disables the
      animation and the per-second transform attribute takes over. */
+  /* Drawn around its own origin (see clock.js), so the default pivot is the hub. */
   .analog .second-sweep {
-    transform-box: view-box;
-    transform-origin: 100px 100px;
+    transform-origin: 0 0;
     animation: second-sweep 60s linear infinite;
   }
   @keyframes second-sweep {

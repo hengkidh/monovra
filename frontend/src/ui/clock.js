@@ -49,11 +49,17 @@ function AnalogClock() {
   }
   const hour = svg('line', { class: 'hand', x1: 100, y1: 108, x2: 100, y2: 56, 'stroke-width': 7 });
   const minute = svg('line', { class: 'hand', x1: 100, y1: 112, x2: 100, y2: 30, 'stroke-width': 4 });
-  const secondLine = svg('line', { class: 'hand-second', x1: 100, y1: 122, x2: 100, y2: 22, 'stroke-width': 2 });
+  // The second hand is drawn around (0,0) inside a group moved to the dial
+  // centre, so it always rotates about its own origin. A CSS pivot at
+  // "100px 100px" needs `transform-box`, which older head-unit WebViews do not
+  // support: the pivot drifts and the hand orbits around the dial.
+  const secondLine = svg('line', { class: 'hand-second', x1: 0, y1: 22, x2: 0, y2: -78, 'stroke-width': 2 });
   // The group sweeps continuously via a 60s CSS animation (GPU, no JS per frame).
   const second = svg('g', { class: 'second-sweep' });
   second.append(secondLine);
-  root.append(hour, minute, svg('circle', { class: 'hub', cx: 100, cy: 100, r: 6 }), second, svg('circle', { class: 'hub-second', cx: 100, cy: 100, r: 3 }));
+  const secondPivot = svg('g', { transform: 'translate(100 100)' });
+  secondPivot.append(second);
+  root.append(hour, minute, svg('circle', { class: 'hub', cx: 100, cy: 100, r: 6 }), secondPivot, svg('circle', { class: 'hub-second', cx: 100, cy: 100, r: 3 }));
 
   return {
     el: root,
@@ -74,7 +80,7 @@ function AnalogClock() {
       // Exactly one driver for the second hand. While the CSS sweep runs, the
       // stepped transform attribute must stay off: older Android WebViews paint
       // both on attribute changes, which shows as a doubled (ghost) hand.
-      if (REDUCED_MOTION.matches) second.setAttribute('transform', `rotate(${sec * 6} 100 100)`);
+      if (REDUCED_MOTION.matches) second.setAttribute('transform', `rotate(${sec * 6})`);
       else second.removeAttribute('transform');
     },
   };
