@@ -1,4 +1,5 @@
-# Builds a signed release APK and attaches it to a GitHub Release.
+# Builds a signed release APK (sideloading) and AAB (Google Play upload) and
+# attaches both to a GitHub Release.
 #
 # Trigger: push a tag like v0.1.0
 #   git tag v0.1.0 && git push origin v0.1.0
@@ -99,7 +100,7 @@ jobs:
           fi
           echo "MONOVRA_KEYSTORE_FILE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
 
-      - name: Build release APK
+      - name: Build release APK and AAB
         working-directory: android
         env:
           MONOVRA_KEYSTORE_PASSWORD: ${{ secrets.MONOVRA_KEYSTORE_PASSWORD }}
@@ -109,7 +110,7 @@ jobs:
           VERSION_CODE: ${{ steps.version.outputs.code }}
         run: |
           chmod +x gradlew
-          ./gradlew --no-daemon assembleRelease \
+          ./gradlew --no-daemon assembleRelease bundleRelease \
             -PversionName="$VERSION_NAME" \
             -PversionCode="$VERSION_CODE"
 
@@ -117,9 +118,13 @@ jobs:
         id: apk
         run: |
           OUT="monovra-${{ steps.version.outputs.tag }}.apk"
+          AAB="monovra-${{ steps.version.outputs.tag }}.aab"
           cp android/app/build/outputs/apk/release/app-release.apk "$OUT"
+          cp android/app/build/outputs/bundle/release/app-release.aab "$AAB"
           sha256sum "$OUT" > "$OUT.sha256"
+          sha256sum "$AAB" > "$AAB.sha256"
           echo "file=$OUT" >> "$GITHUB_OUTPUT"
+          echo "aab=$AAB" >> "$GITHUB_OUTPUT"
 
       - name: Publish GitHub Release
         env:
@@ -127,8 +132,10 @@ jobs:
         run: |
           TAG="${{ steps.version.outputs.tag }}"
           if gh release view "$TAG" > /dev/null 2>&1; then
-            gh release upload "$TAG" "${{ steps.apk.outputs.file }}" "${{ steps.apk.outputs.file }}.sha256" --clobber
+            gh release upload "$TAG" "${{ steps.apk.outputs.file }}" "${{ steps.apk.outputs.file }}.sha256" \
+              "${{ steps.apk.outputs.aab }}" "${{ steps.apk.outputs.aab }}.sha256" --clobber
           else
             gh release create "$TAG" "${{ steps.apk.outputs.file }}" "${{ steps.apk.outputs.file }}.sha256" \
+              "${{ steps.apk.outputs.aab }}" "${{ steps.apk.outputs.aab }}.sha256" \
               --title "MONOVRA $TAG" --generate-notes --target "${{ github.sha }}"
           fi

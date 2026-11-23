@@ -227,7 +227,7 @@ Two workflows are included:
 - **CI** (`.github/workflows/ci.yml`): every push / PR builds the debug APK and lint,
   and uploads the APK as a workflow artifact (14 days).
 - **Release APK** (`.github/workflows/release.yml`): pushing a tag `v*` builds a signed
-  release APK and attaches `monovra-vX.Y.Z.apk` + `.sha256` to a GitHub Release.
+  release APK and AAB and attaches `monovra-vX.Y.Z.apk`, `monovra-vX.Y.Z.aab` and their `.sha256` files to a GitHub Release.
 
 One-time setup, in the repository's **Settings › Secrets and variables › Actions**:
 
@@ -247,6 +247,15 @@ git push origin v0.1.0
 
 The version name comes from the tag; the version code is `100 + workflow run number`, so it always
 increases. You can also start the workflow manually (*Actions › Release APK › Run workflow*).
+
+---
+
+### 7.1 Google Play
+
+Each release tag also attaches `monovra-vX.Y.Z.aab` (Android App Bundle), the format Play Console
+requires. Build one locally with `make bundle` → `dist/monovra-release.aab`.
+Store listing text, Data safety answers and the release steps are in
+[`docs/play-store/listing.md`](docs/play-store/listing.md); the privacy policy is [`PRIVACY.md`](PRIVACY.md).
 
 ---
 

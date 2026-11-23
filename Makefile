@@ -2,13 +2,14 @@
 COMPOSE := docker compose
 RUN     := $(COMPOSE) run --rm builder
 
-.PHONY: help image web apk release wrapper shell install logcat clean
+.PHONY: help image web apk release bundle wrapper shell install logcat clean
 
 help:
 	@echo "make image    Build the Android builder image"
 	@echo "make web      Run the frontend dev server on http://localhost:5173"
 	@echo "make apk      Build debug APK   -> dist/monovra-debug.apk"
 	@echo "make release  Build release APK -> dist/monovra-release.apk"
+	@echo "make bundle   Build release AAB -> dist/monovra-release.aab (Google Play)"
 	@echo "make wrapper  (Re)generate the Gradle wrapper in android/"
 	@echo "make shell    Open a shell in the builder container"
 	@echo "make install  Install the debug APK with host adb"
@@ -26,6 +27,9 @@ apk:
 
 release:
 	$(RUN) scripts/build.sh release
+
+bundle:
+	$(RUN) scripts/build.sh bundle
 
 wrapper:
 	$(RUN) bash -c "cd android && ./gradlew wrapper --gradle-version 8.11.1 --no-daemon"
