@@ -29,7 +29,7 @@ Android car head units. Black, white and gray form the foundation, Indigo
 
 ## Contents
 
-1. [Download the APK](#1-download-the-apk)
+1. [Download](#1-download)
 2. [Install on a head unit](#2-install-on-a-head-unit)
 3. [Project structure](#3-project-structure)
 4. [Development with Docker](#4-development-with-docker)
@@ -46,7 +46,15 @@ Android car head units. Black, white and gray form the foundation, Indigo
 
 ---
 
-## 1. Download the APK
+## 1. Download
+
+**Google Play (recommended)**
+
+[Get MONOVRA on Google Play](https://play.google.com/store/apps/details?id=id.hengki.monovra).
+Installing from the Play Store needs no "unknown apps" permission and gives automatic updates.
+Head units without the Play Store can use the APK below.
+
+**APK**
 
 Release builds are published on the repository's **GitHub Releases** page
 (`monovra-vX.Y.Z.apk` plus a `.sha256` checksum). Every push also builds a debug
@@ -54,8 +62,9 @@ APK, downloadable from the **Actions** tab › *CI* › run › *Artifacts*.
 
 ## 2. Install on a head unit
 
-1. Copy the APK to the head unit (USB stick or download it in the unit's browser) and open it.
-   Allow "Install unknown apps" for the file manager or browser if asked.
+1. Install MONOVRA from **Google Play** on the head unit, or copy the APK to the head unit
+   (USB stick or download it in the unit's browser) and open it.
+   For the APK, allow "Install unknown apps" for the file manager or browser if asked.
 2. Open **MONOVRA**.
 3. **Settings › Music › Open permission settings** and enable Notification Access for MONOVRA
    (needed to show and control music, see [§12](#12-permissions-and-firmware-limitations)).
