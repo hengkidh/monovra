@@ -1,5 +1,7 @@
 # MONOVRA
 
+![MONOVRA — Less interface. More drive.](docs/play-store/feature-graphic.png)
+
 **Less interface. More drive.**
 
 MONOVRA is a lightweight, minimalist **Android Home launcher** for aftermarket
@@ -14,6 +16,12 @@ Android car head units. Black, white and gray form the foundation, Indigo
 - A calm idle state when nothing is playing, with one-tap buttons for the installed music apps
 - Grayscale app icons, full-color album art
 - Works fully offline: no INTERNET permission, no backend, no analytics
+
+| Home · Dark | Home · Light |
+|---|---|
+| ![Home screen in Dark mode](docs/play-store/screenshots/1-home-dark.png) | ![Home screen in Light mode](docs/play-store/screenshots/2-home-light.png) |
+| **Focus Mode · Player** | **Focus Mode · Ambient** |
+| ![Focus Mode with the player layout](docs/play-store/screenshots/3-focus-player-dark.png) | ![Focus Mode with the ambient layout over blurred album art](docs/play-store/screenshots/4-focus-ambient-dark.png) |
 
 > Application ID: `id.hengki.monovra` · Android 10+ (API 29) · landscape-first (1024×600, 1280×720 and others)
 
