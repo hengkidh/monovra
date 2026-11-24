@@ -154,7 +154,9 @@ class NavigationRepository(
 
     companion object {
         private const val TAG = "Monovra"
-        private const val ARROW_PX = 192
+        // Large enough that a vector source stays sharp on a head unit; the WebView
+        // prefers its own SVG arrow and only falls back to this bitmap.
+        private const val ARROW_PX = 384
         private const val MAX_TEXT = 160
         val SOURCES = setOf("com.google.android.apps.maps", "com.waze")
 

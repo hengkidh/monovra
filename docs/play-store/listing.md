@@ -189,6 +189,20 @@ collection. Still "No" after the next-turn feature (v0.4.0).
 
 ## 8. Release notes ("What's new", ≤ 500 characters)
 
+### v0.4.1
+
+English:
+
+```
+Next turn, refined. The turn card now appears only as the turn gets close (or briefly when a new step starts), so the clock and music stay on screen between turns. Turn arrows are now sharp vector icons on large head-unit screens, the time left to arrival is easier to read, and the Focus-mode turn card is better balanced.
+```
+
+Bahasa Indonesia:
+
+```
+Belokan berikutnya, lebih rapi. Kartu belokan kini hanya muncul saat belokan sudah dekat (atau sebentar ketika langkah baru dimulai), jadi jam dan musik tetap tampil di antara belokan. Panah belokan kini tajam di layar head unit yang besar, sisa waktu perjalanan lebih mudah dibaca, dan kartu belokan di mode Focus lebih seimbang.
+```
+
 ### v0.4.0
 
 English:

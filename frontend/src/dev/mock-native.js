@@ -95,14 +95,15 @@ export function createMockNative(receive) {
     emit('system', { ...system });
   });
   let navStep = 0;
-  const NAV_STEPS = [450, 300, 200, 120, 60, 30];
+  const NAV_STEPS = [900, 700, 450, 300, 200, 120, 60, 30];
+  const NAV_TURNS = ['Turn right onto Merdeka Street', 'Belok kiri ke Jl. Sudirman', 'Di bundaran, ambil jalan keluar ke-2', 'Slight left toward the toll road'];
   const navigation = () =>
     params.get('nav') === 'on'
       ? {
           active: true,
           source: { packageName: 'com.google.android.apps.maps', label: STORE_DEMO ? 'Navigation' : 'Maps' },
           distance: `${NAV_STEPS[navStep % NAV_STEPS.length]} m`,
-          instruction: 'Turn right onto Merdeka Street',
+          instruction: NAV_TURNS[Math.floor(navStep / NAV_STEPS.length) % NAV_TURNS.length],
           eta: '18 min · 8.4 km · 14:32 arrival',
           arrow: ARROW,
         }

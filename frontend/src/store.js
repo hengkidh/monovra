@@ -7,6 +7,7 @@ export const state = {
   apps: [],
   music: null,
   navigation: { active: false },
+  navShown: false, // next turn near or just changed (ui/navigation.js)
   system: { isDefaultLauncher: false, homeRoleAvailable: false, notificationAccess: false, sdkInt: 0, nightMode: null },
   view: 'home', // home | focus | apps | settings
   settingsSection: 'appearance',

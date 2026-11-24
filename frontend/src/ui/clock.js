@@ -239,16 +239,16 @@ export function ClockPanel() {
   const page1 = h('div', { class: 'clock-page' }, analog.el, small.el);
   const page2 = h('div', { class: 'clock-page' }, LargeTime());
   const pager = Pager([page1, page2], { key: 'monovra.clockPage', labels: ['Analog clock', 'Large clock'] });
-  // While a navigation app shows a turn, the next turn takes the clock's place.
+  // When the next turn is near (or a new step starts), it takes the clock's place.
   const turn = NextTurnCard();
   const section = h('section', { class: 'clock-panel', 'aria-label': 'Clock' }, pager, turn);
   const render = () => {
-    const navigating = !!state.navigation?.active;
+    const navigating = !!state.navShown;
     pager.hidden = navigating;
     turn.hidden = !navigating;
     section.setAttribute('aria-label', navigating ? 'Next turn' : 'Clock');
   };
-  watch(['navigation'], render);
+  watch(['navShown'], render);
   render();
   return section;
 }

@@ -34,7 +34,7 @@ steps:
     kind: screen
     title: Show next turn
     screen: { route: /, name: Dashboard next-turn card, dock chip, or focus-mode turn in place of the player }
-    action: The driver sees arrow, distance and instruction; the card turns to full accent within 50 m
+    action: The card replaces the clock or player only within 300 m of the turn or for 8 s after a new step; between turns the clock and player stay. A vector arrow is drawn from the instruction text (bitmap arrow only as fallback); the card turns to full accent within 50 m
     next: open-navigation
   - id: open-navigation
     kind: action
@@ -55,3 +55,5 @@ Read-only for the driver except the tap that opens the navigation app. Developme
 
 ## Gotchas
 - Without Notification Access, nothing is shown; the rest of the dashboard is unaffected.
+- The vector arrow depends on recognisable words (ID/EN) in the instruction; when the app gives only a street name, the blurrier notification bitmap is used.
+- The dock chip outside Home stays visible for the whole route; only takeovers of the clock and player wait for the turn.

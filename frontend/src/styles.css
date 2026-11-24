@@ -1502,15 +1502,28 @@
     background: transparent;
     color: var(--fg);
     text-align: left;
+    overflow: hidden;
+  }
+  /* Short cards (compact head-unit layouts): drop the ETA row first so it
+     never spills over neighbouring panels; distance and arrow matter most. */
+  @container (max-height: 13rem) {
+    .nav-meta {
+      display: none;
+    }
   }
   .nav-card:active {
     background: var(--elevated);
   }
+  /* Source on top, ETA under it: a long ETA wraps instead of running into
+     the next panel on narrow head units. */
   .nav-meta {
     width: 100%;
+    min-width: 0;
     display: flex;
-    justify-content: space-between;
-    gap: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+    text-align: left;
     color: var(--fg-muted);
     font-size: 0.85rem;
     font-weight: 500;
@@ -1520,10 +1533,21 @@
     align-items: center;
     gap: 0.4rem;
   }
+  /* Full ETA in muted text; only the time left is large, bold and indigo. */
   .nav-eta {
+    font-size: clamp(0.95rem, 4cqw, 1.1rem);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+    max-width: 100%;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .nav-eta-time {
+    color: var(--primary-text);
+    font-size: clamp(1.3rem, 5.5cqw, 1.6rem);
+    font-weight: 700;
   }
   .nav-arrow {
     align-self: center;
@@ -1614,13 +1638,28 @@
   .nav-swap {
     display: contents;
   }
+  /* Focus mode: one centred block (arrow, distance, step, ETA) that sits on
+     the same middle line as the clock beside it. */
   .nav-swap.is-focus-card > .nav-card {
-    /* Keeps the source/ETA row clear of the focus exit button. */
-    padding-top: 4.5rem;
     width: 100%;
     height: 100%;
-    justify-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(0.75rem, 3cqh, 1.5rem);
     text-align: center;
+  }
+  .nav-swap.is-focus-card .nav-arrow {
+    width: min(42cqh, 60cqw, 13rem);
+  }
+  .nav-swap.is-focus-card .nav-meta {
+    order: 3;
+    align-items: center;
+    text-align: center;
+  }
+  .nav-swap.is-focus-card .nav-text {
+    order: 2;
   }
   .nav-chip.is-focus-mini {
     justify-self: center;
