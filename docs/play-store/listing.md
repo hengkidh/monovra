@@ -189,6 +189,10 @@ collection. Still "No" after the next-turn feature (v0.4.0).
 
 ## 8. Release notes ("What's new", ≤ 500 characters)
 
+### v0.4.2
+
+Same notes as v0.4.1 (v0.4.1 was never published); the turn arrow is also sharp when the navigation app gives only a street name.
+
 ### v0.4.1
 
 English:
