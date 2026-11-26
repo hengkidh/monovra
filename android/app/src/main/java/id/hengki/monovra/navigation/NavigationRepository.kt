@@ -134,17 +134,40 @@ class NavigationRepository(
     }
 
     private fun loadArrow(n: Notification): ByteArray? = try {
-        val bitmap = n.getLargeIcon()?.loadDrawable(context)?.toBitmap(ARROW_PX, ARROW_PX)
-            ?: @Suppress("DEPRECATION") (n.extras?.getParcelable(Notification.EXTRA_LARGE_ICON) as? Bitmap)
-        bitmap?.let { bmp ->
+        // Load at the icon's own size; upscaling happens once, in sharpen().
+        val drawable = n.getLargeIcon()?.loadDrawable(context)
+        val source = drawable?.let {
+            val w = it.intrinsicWidth.takeIf { v -> v > 0 } ?: ARROW_PX
+            val h = it.intrinsicHeight.takeIf { v -> v > 0 } ?: ARROW_PX
+            it.toBitmap(w, h, Bitmap.Config.ARGB_8888)
+        } ?: @Suppress("DEPRECATION") (n.extras?.getParcelable(Notification.EXTRA_LARGE_ICON) as? Bitmap)
+        source?.let { bmp ->
             ByteArrayOutputStream(16 * 1024).use { out ->
-                bmp.compress(Bitmap.CompressFormat.PNG, 100, out)
+                sharpen(bmp).compress(Bitmap.CompressFormat.PNG, 100, out)
                 out.toByteArray()
             }
         }
     } catch (e: Exception) {
         Log.i(TAG, "Navigation arrow unavailable: ${e.javaClass.simpleName}")
         null
+    }
+
+    /**
+     * The WebView uses the arrow only as an alpha mask. Maps ships a small
+     * bitmap, so a plain upscale is blurry on a head unit. Upscale with
+     * filtering, then pull the alpha into a narrow ramp: edges become crisp
+     * (about one pixel of anti-aliasing) whatever the arrow's shape.
+     */
+    private fun sharpen(src: Bitmap): Bitmap {
+        val soft = Bitmap.createScaledBitmap(src.copy(Bitmap.Config.ARGB_8888, false), ARROW_PX, ARROW_PX, true)
+        val px = IntArray(ARROW_PX * ARROW_PX)
+        soft.getPixels(px, 0, ARROW_PX, 0, 0, ARROW_PX, ARROW_PX)
+        for (i in px.indices) {
+            val a = px[i] ushr 24
+            val ramp = ((a - ALPHA_LOW) * 255 / (ALPHA_HIGH - ALPHA_LOW)).coerceIn(0, 255)
+            px[i] = (ramp shl 24) or 0xFFFFFF
+        }
+        return Bitmap.createBitmap(px, ARROW_PX, ARROW_PX, Bitmap.Config.ARGB_8888)
     }
 
     private fun urlOf(token: Long) = "/nav/$token.png"
@@ -157,6 +180,8 @@ class NavigationRepository(
         // Large enough that a vector source stays sharp on a head unit; the WebView
         // prefers its own SVG arrow and only falls back to this bitmap.
         private const val ARROW_PX = 384
+        private const val ALPHA_LOW = 104
+        private const val ALPHA_HIGH = 152
         private const val MAX_TEXT = 160
         val SOURCES = setOf("com.google.android.apps.maps", "com.waze")
 
