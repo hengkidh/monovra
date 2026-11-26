@@ -191,7 +191,17 @@ collection. Still "No" after the next-turn feature (v0.4.0).
 
 ### v0.4.2
 
-Same notes as v0.4.1 (v0.4.1 was never published); the turn arrow is also sharp when the navigation app gives only a street name.
+English:
+
+```
+Sharper turn arrows. When the navigation app gives only a street name, the next-turn arrow is now crisp on large head-unit screens instead of blurry.
+```
+
+Bahasa Indonesia:
+
+```
+Panah belokan lebih tajam. Saat aplikasi navigasi hanya memberi nama jalan, panah belokan berikutnya kini tetap tajam di layar head unit yang besar, tidak lagi kabur.
+```
 
 ### v0.4.1
 
